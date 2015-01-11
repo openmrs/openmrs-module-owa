@@ -1,3 +1,5 @@
+package org.openmrs.module.owa.web.controller;
+
 /*
  * Copyright (c) 2004-2014, University of Oslo
  * All rights reserved.
@@ -25,32 +27,89 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openmrs.module.owa.web.controller;
 
+import java.io.File;
+import java.util.List;
+import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Saptarshi Purkayastha
  */
-@Controller
-public class DeleteAppAction {
+public class AppSettingsController {
+	
+	boolean isSaved;
 	
 	// -------------------------------------------------------------------------
 	// Dependencies
 	// -------------------------------------------------------------------------
+	
 	//@Autowired
 	private AppManager appManager;
 	
 	// -------------------------------------------------------------------------
 	// Input & Output
 	// -------------------------------------------------------------------------
-	private String appName;
 	
-	public void setAppName(String appName) {
-		this.appName = appName;
+	private String appFolderPath;
+	
+	public String getAppFolderPath() {
+		appFolderPath = appManager.getAppFolderPath();
+		
+		if (null == appFolderPath || appFolderPath.isEmpty()) {
+			String realPath = "";/* = ServletActionContext.getServletContext().getRealPath("/")*/
+			;
+			if (realPath.endsWith("/") || realPath.endsWith("\\")) {
+				appFolderPath = realPath + "apps";
+			} else {
+				appFolderPath = realPath + File.separatorChar + "apps";
+			}
+			
+			appManager.setAppFolderPath(appFolderPath);
+		}
+		
+		return appFolderPath;
+	}
+	
+	public void setAppFolderPath(String appFolderPath) {
+		isSaved = true;
+		appManager.setAppFolderPath(appFolderPath);
+	}
+	
+	private String appBaseUrl;
+	
+	public String getAppBaseUrl() {
+		appBaseUrl = appManager.getAppBaseUrl();
+		
+		/*if (null == appBaseUrl || appBaseUrl.isEmpty()) {
+			HttpServletRequest request = ServletActionContext.getRequest();
+			String realPath = ServletActionContext.getServletContext().getRealPath("/");
+			String appsPath = appManager.getAppFolderPath();
+			String baseUrl = ContextUtils.getBaseUrl(request);
+			String contextPath = request.getContextPath();
+			
+			if (!contextPath.isEmpty()) {
+				appBaseUrl = baseUrl.substring(0, baseUrl.length() - 1) + request.getContextPath() + "/"
+				        + ((appsPath.replace("//", "/")).replace(realPath, "")).replace('\\', '/');
+			} else {
+				appBaseUrl = baseUrl.substring(0, baseUrl.length() - 1)
+				        + ((appsPath.replace("//", "/")).replace(realPath, "")).replace('\\', '/');
+			}
+			
+			appManager.setAppBaseUrl(appBaseUrl);
+		}*/
+		
+		return appBaseUrl;
+	}
+	
+	public void setAppBaseUrl(String appBaseUrl) {
+		appManager.setAppBaseUrl(appBaseUrl);
+	}
+	
+	public List<App> getAppList() {
+		return appManager.getApps();
 	}
 	
 	private String message;
@@ -62,12 +121,11 @@ public class DeleteAppAction {
 	// -------------------------------------------------------------------------
 	// Action implementation
 	// -------------------------------------------------------------------------
-	@RequestMapping(value = "/module/owa/deleteApp", method = RequestMethod.GET)
-	public String execute() throws Exception {
-		if (appName != null && appManager.deleteApp(appName)) {
-			//message = i18n.getString("appmanager_delete_success");
-		}
+	@RequestMapping(value = "/module/owa/appSettings", method = RequestMethod.GET)
+	public String execute() {
+		//message = i18n.getString("appmanager_saved_settings");
+		appManager.reloadApps();
 		
-		return "";
+		return isSaved ? "test" : "getSuccess";
 	}
 }

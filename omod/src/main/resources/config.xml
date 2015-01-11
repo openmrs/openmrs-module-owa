@@ -42,6 +42,22 @@
     <mappingFiles>
 				
     </mappingFiles>
+    
+    <globalProperty>
+        <property>owa.appFolderPath</property>
+        <defaultValue></defaultValue>
+        <description>The default location where the apps are stored on disk</description>
+    </globalProperty>
+    <globalProperty>
+        <property>owa.appBaseUrl</property>
+        <defaultValue></defaultValue>
+        <description>The base URL from where the Open Web Apps are hosted</description>
+    </globalProperty>
+    <globalProperty>
+        <property>owa.appStoreUrl</property>
+        <defaultValue>http://appstore.openmrs.org</defaultValue>
+        <description>The default URL for the OpenMRS appstore</description>
+    </globalProperty>
 
     <!-- Internationalization -->
     <!-- All message codes should start with ${project.parent.artifactId}. -->

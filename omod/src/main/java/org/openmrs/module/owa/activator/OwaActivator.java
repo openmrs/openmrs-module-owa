@@ -8,6 +8,7 @@ package org.openmrs.module.owa.activator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.owa.impl.DefaultAppManager;
 
 /**
  * This class contains the logic that is run every time this module is either started or stopped.

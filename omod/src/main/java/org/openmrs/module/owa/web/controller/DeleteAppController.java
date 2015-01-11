@@ -1,5 +1,3 @@
-package org.openmrs.module.owa.web.controller;
-
 /*
  * Copyright (c) 2004-2014, University of Oslo
  * All rights reserved.
@@ -27,12 +25,9 @@ package org.openmrs.module.owa.web.controller;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.openmrs.module.owa.web.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,52 +36,38 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author Saptarshi Purkayastha
  */
 @Controller
-public class AppListAction {
+public class DeleteAppController {
 	
 	// -------------------------------------------------------------------------
 	// Dependencies
 	// -------------------------------------------------------------------------
-	
 	//@Autowired
 	private AppManager appManager;
 	
 	// -------------------------------------------------------------------------
 	// Input & Output
 	// -------------------------------------------------------------------------
-	private List<App> appList = new ArrayList();
+	private String appName;
 	
-	public List<App> getAppList() {
-		return appList;
+	public void setAppName(String appName) {
+		this.appName = appName;
 	}
 	
-	//TODO create settings to set for external server like Apache2/nginx
-	//TODO Should be a per-app setting
-	private String appBaseUrl;
+	private String message;
 	
-	public String getAppBaseUrl() {
-		return appBaseUrl;
-	}
-	
-	private String appStoreUrl;
-	
-	public String getAppStoreUrl() {
-		return appStoreUrl;
-	}
-	
-	private boolean settingsValid;
-	
-	public boolean isSettingsValid() {
-		return settingsValid;
+	public String getMessage() {
+		return message;
 	}
 	
 	// -------------------------------------------------------------------------
-	// REST implementation
+	// Action implementation
 	// -------------------------------------------------------------------------
-	@RequestMapping(value = "/module/owa/appList", method = RequestMethod.GET)
-	public void execute() {
-		appList = appManager.getApps();
-		appBaseUrl = appManager.getAppBaseUrl();
-		appStoreUrl = appManager.getAppStoreUrl();
-		settingsValid = appManager.getAppFolderPath() != null && appBaseUrl != null;
+	@RequestMapping(value = "/module/owa/deleteApp", method = RequestMethod.GET)
+	public String execute() throws Exception {
+		if (appName != null && appManager.deleteApp(appName)) {
+			//message = i18n.getString("appmanager_delete_success");
+		}
+		
+		return "";
 	}
 }

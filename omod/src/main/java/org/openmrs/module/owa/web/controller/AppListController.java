@@ -28,19 +28,20 @@ package org.openmrs.module.owa.web.controller;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
+
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * @author Saptarshi Purkayastha
  */
-public class AppSettingsAction {
-	
-	boolean isSaved;
+@Controller
+public class AppListController {
 	
 	// -------------------------------------------------------------------------
 	// Dependencies
@@ -52,80 +53,40 @@ public class AppSettingsAction {
 	// -------------------------------------------------------------------------
 	// Input & Output
 	// -------------------------------------------------------------------------
+	private List<App> appList = new ArrayList();
 	
-	private String appFolderPath;
-	
-	public String getAppFolderPath() {
-		appFolderPath = appManager.getAppFolderPath();
-		
-		if (null == appFolderPath || appFolderPath.isEmpty()) {
-			String realPath = "";/* = ServletActionContext.getServletContext().getRealPath("/")*/
-			;
-			if (realPath.endsWith("/") || realPath.endsWith("\\")) {
-				appFolderPath = realPath + "apps";
-			} else {
-				appFolderPath = realPath + File.separatorChar + "apps";
-			}
-			
-			appManager.setAppFolderPath(appFolderPath);
-		}
-		
-		return appFolderPath;
+	public List<App> getAppList() {
+		return appList;
 	}
 	
-	public void setAppFolderPath(String appFolderPath) {
-		isSaved = true;
-		appManager.setAppFolderPath(appFolderPath);
-	}
-	
+	//TODO create settings to set for external server like Apache2/nginx
+	//TODO Should be a per-app setting
 	private String appBaseUrl;
 	
 	public String getAppBaseUrl() {
-		appBaseUrl = appManager.getAppBaseUrl();
-		
-		/*if (null == appBaseUrl || appBaseUrl.isEmpty()) {
-			HttpServletRequest request = ServletActionContext.getRequest();
-			String realPath = ServletActionContext.getServletContext().getRealPath("/");
-			String appsPath = appManager.getAppFolderPath();
-			String baseUrl = ContextUtils.getBaseUrl(request);
-			String contextPath = request.getContextPath();
-			
-			if (!contextPath.isEmpty()) {
-				appBaseUrl = baseUrl.substring(0, baseUrl.length() - 1) + request.getContextPath() + "/"
-				        + ((appsPath.replace("//", "/")).replace(realPath, "")).replace('\\', '/');
-			} else {
-				appBaseUrl = baseUrl.substring(0, baseUrl.length() - 1)
-				        + ((appsPath.replace("//", "/")).replace(realPath, "")).replace('\\', '/');
-			}
-			
-			appManager.setAppBaseUrl(appBaseUrl);
-		}*/
-		
 		return appBaseUrl;
 	}
 	
-	public void setAppBaseUrl(String appBaseUrl) {
-		appManager.setAppBaseUrl(appBaseUrl);
+	private String appStoreUrl;
+	
+	public String getAppStoreUrl() {
+		return appStoreUrl;
 	}
 	
-	public List<App> getAppList() {
-		return appManager.getApps();
-	}
+	private boolean settingsValid;
 	
-	private String message;
-	
-	public String getMessage() {
-		return message;
+	public boolean isSettingsValid() {
+		return settingsValid;
 	}
 	
 	// -------------------------------------------------------------------------
-	// Action implementation
+	// REST implementation
 	// -------------------------------------------------------------------------
-	@RequestMapping(value = "/module/owa/appSettings", method = RequestMethod.GET)
-	public String execute() {
-		//message = i18n.getString("appmanager_saved_settings");
-		appManager.reloadApps();
-		
-		return isSaved ? "test" : "getSuccess";
+	@RequestMapping(value = "/module/owa/appList", method = RequestMethod.GET)
+	public void execute() {
+		appList = appManager.getApps();
+		appBaseUrl = appManager.getAppBaseUrl();
+		appStoreUrl = appManager.getAppStoreUrl();
+		settingsValid = appManager.getAppFolderPath() != null && appBaseUrl != null;
 	}
 }

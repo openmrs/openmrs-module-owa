@@ -23,7 +23,4 @@
     <!-- Add here beans related to the API context -->
     <context:annotation-config/>
     <context:component-scan base-package="org.openmrs.module.owa" />
-    
-    <bean id="org.hisp.dhis.appmanager.AppManager" class="org.hisp.dhis.appmanager.DefaultAppManager" />
-    
 </beans>

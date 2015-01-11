@@ -1,5 +1,3 @@
-package org.openmrs.module.owa;
-
 /*
  * Copyright (c) 2004-2014, University of Oslo
  * All rights reserved.
@@ -27,6 +25,8 @@ package org.openmrs.module.owa;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package org.openmrs.module.owa.impl;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,12 +39,15 @@ import javax.annotation.PostConstruct;
 
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.codehaus.jackson.map.DeserializationConfig;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openmrs.GlobalProperty;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.owa.App;
+import org.openmrs.module.owa.AppManager;
 
 /**
  * @author Saptarshi Purkayastha
@@ -58,13 +61,9 @@ public class DefaultAppManager implements AppManager {
 	 */
 	private List<App> apps = new ArrayList();
 	
-	@PostConstruct
 	private void init() {
 		reloadApps();
 	}
-	
-	@Autowired
-	private SystemSettingManager appSettingManager;
 	
 	// -------------------------------------------------------------------------
 	// AppManagerService implementation
@@ -81,45 +80,44 @@ public class DefaultAppManager implements AppManager {
 	}
 	
 	@Override
-	public void installApp(File file, String fileName, String rootPath) throws IOException {
-		ZipFile zip = new ZipFile(file);
-		ZipEntry entry = zip.getEntry("manifest.webapp");
-		
-		InputStream inputStream = zip.getInputStream(entry);
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		
-		App app = mapper.readValue(inputStream, App.class);
-		
-		// ---------------------------------------------------------------------
-		// Delete if app is already installed
-		// ---------------------------------------------------------------------
-		if (getApps().contains(app)) {
-			String folderPath = getAppFolderPath() + File.separator + app.getFolderName();
-			FileUtils.forceDelete(new File(folderPath));
-		}
-		
-		String dest = getAppFolderPath() + File.separator + fileName.substring(0, fileName.lastIndexOf('.'));
-		Unzip unzip = new Unzip();
-		unzip.setSrc(file);
-		unzip.setDest(new File(dest));
-		unzip.execute();
-		
-		// ---------------------------------------------------------------------
-		// Set dhis server location
-		// ---------------------------------------------------------------------
-		File updateManifest = new File(dest + File.separator + "manifest.webapp");
-		App installedApp = mapper.readValue(updateManifest, App.class);
-		
-		if (installedApp.getActivities().getDhis().getHref().equals("*")) {
-			installedApp.getActivities().getDhis().setHref(rootPath);
-			mapper.writeValue(updateManifest, installedApp);
-		}
-		
-		zip.close();
-		
-		reloadApps(); // Reload app state
-	}
+    public void installApp(File file, String fileName, String rootPath) throws IOException {
+        try (ZipFile zip = new ZipFile(file)) {
+            ZipEntry entry = zip.getEntry("manifest.webapp");
+
+            InputStream inputStream = zip.getInputStream(entry);
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+            App app = mapper.readValue(inputStream, App.class);
+
+            // ---------------------------------------------------------------------
+            // Delete if app is already installed
+            // ---------------------------------------------------------------------
+            if (getApps().contains(app)) {
+                String folderPath = getAppFolderPath() + File.separator + app.getFolderName();
+                FileUtils.forceDelete(new File(folderPath));
+            }
+
+            String dest = getAppFolderPath() + File.separator + fileName.substring(0, fileName.lastIndexOf('.'));
+            Unzip unzip = new Unzip();
+            unzip.setSrc(file);
+            unzip.setDest(new File(dest));
+            unzip.execute();
+
+            // ---------------------------------------------------------------------
+            // Set openmrs server location
+            // ---------------------------------------------------------------------
+            File updateManifest = new File(dest + File.separator + "manifest.webapp");
+            App installedApp = mapper.readValue(updateManifest, App.class);
+
+            if (installedApp.getActivities().getOpenmrs().getHref().equals("*")) {
+                installedApp.getActivities().getOpenmrs().setHref(rootPath);
+                mapper.writeValue(updateManifest, installedApp);
+            }
+        }
+
+        reloadApps(); // Reload app state
+    }
 	
 	@Override
 	public boolean exists(String appName) {
@@ -157,7 +155,7 @@ public class DefaultAppManager implements AppManager {
 	
 	@Override
 	public String getAppFolderPath() {
-		return StringUtils.trimToNull((String) appSettingManager.getSystemSetting(KEY_APP_FOLDER_PATH));
+		return Context.getAdministrationService().getGlobalProperty(KEY_APP_FOLDER_PATH);
 	}
 	
 	@Override
@@ -174,27 +172,27 @@ public class DefaultAppManager implements AppManager {
 			}
 		}
 		
-		appSettingManager.saveSystemSetting(KEY_APP_FOLDER_PATH, appFolderPath);
+		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(KEY_APP_FOLDER_PATH, appFolderPath));
 	}
 	
 	@Override
 	public String getAppBaseUrl() {
-		return StringUtils.trimToNull((String) appSettingManager.getSystemSetting(KEY_APP_BASE_URL));
+		return Context.getAdministrationService().getGlobalProperty(KEY_APP_BASE_URL);
 	}
 	
 	@Override
 	public void setAppBaseUrl(String appBaseUrl) {
-		appSettingManager.saveSystemSetting(KEY_APP_BASE_URL, appBaseUrl);
+		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(KEY_APP_BASE_URL, appBaseUrl));
 	}
 	
 	@Override
 	public String getAppStoreUrl() {
-		return StringUtils.trimToNull((String) appSettingManager.getSystemSetting(KEY_APP_STORE_URL, DEFAULT_APP_STORE_URL));
+		return Context.getAdministrationService().getGlobalProperty(KEY_APP_STORE_URL, DEFAULT_APP_STORE_URL);
 	}
 	
 	@Override
 	public void setAppStoreUrl(String appStoreUrl) {
-		appSettingManager.saveSystemSetting(KEY_APP_STORE_URL, appStoreUrl);
+		//appSettingManager.saveSystemSetting(KEY_APP_STORE_URL, appStoreUrl);
 	}
 	
 	// -------------------------------------------------------------------------
@@ -207,10 +205,11 @@ public class DefaultAppManager implements AppManager {
     public void reloadApps() {
         List<App> appList = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         if (null != getAppFolderPath()) {
             File appFolderPath = new File(getAppFolderPath());
+            System.out.println("APPFOLDER PATH = " + getAppFolderPath());
             if (appFolderPath.isDirectory()) {
                 File[] listFiles = appFolderPath.listFiles();
                 for (File folder : listFiles) {
@@ -224,13 +223,23 @@ public class DefaultAppManager implements AppManager {
                             } catch (IOException ex) {
                                 log.error(ex.getLocalizedMessage(), ex);
                             }
+                        } else {
+                            System.out.println(">>>>>>>>>>>>>>MANIFEST NOT FOUND!!");
                         }
                     }
                 }
+            } else {
+                System.out.println(">>>>>>>>> NOT A DIRECTORY");
             }
+        } else {
+            System.out.println(">>>>>>>>>>>> APP FOLDER NULL!!");
         }
 
         this.apps = appList;
+        System.out.println("FOUND TOTAL APPS = " + appList.size());
+        for (App app : appList) {
+            System.out.println(">>>>>>>>>>>>>>>APPS = " + app.getName());
+        }
 
         log.info("Detected apps: " + apps);
     }

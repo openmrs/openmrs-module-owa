@@ -48,8 +48,8 @@ public class AddAppController {
 	
 	private static final String FAILURE = "failure";
 	
-	@Autowired
-	private AppManager appManager;
+	//@Autowired
+	//private AppManager appManager;
 	
 	// -------------------------------------------------------------------------
 	// Input & Output

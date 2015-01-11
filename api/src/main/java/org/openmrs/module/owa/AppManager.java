@@ -40,11 +40,11 @@ public interface AppManager {
 	
 	final String ID = AppManager.class.getName();
 	
-	final String KEY_APP_FOLDER_PATH = "appFolderPath";
+	final String KEY_APP_FOLDER_PATH = "owa.appFolderPath";
 	
-	final String KEY_APP_BASE_URL = "appBaseUrl";
+	final String KEY_APP_BASE_URL = "owa.appBaseUrl";
 	
-	final String KEY_APP_STORE_URL = "appStoreUrl";
+	final String KEY_APP_STORE_URL = "owa.appStoreUrl";
 	
 	final String DEFAULT_APP_STORE_URL = "http://appstore.openmrs.org";
 	
