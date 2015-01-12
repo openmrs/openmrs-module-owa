@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
@@ -65,9 +63,6 @@ public class DefaultAppManager implements AppManager {
 		reloadApps();
 	}
 	
-	// -------------------------------------------------------------------------
-	// AppManagerService implementation
-	// -------------------------------------------------------------------------
 	@Override
 	public List<App> getApps() {
 		String baseUrl = getAppBaseUrl();
@@ -80,7 +75,7 @@ public class DefaultAppManager implements AppManager {
 	}
 	
 	@Override
-    public void installApp(File file, String fileName, String rootPath) throws IOException {
+        public void installApp(File file, String fileName, String rootPath) throws IOException {
         try (ZipFile zip = new ZipFile(file)) {
             ZipEntry entry = zip.getEntry("manifest.webapp");
 
@@ -126,7 +121,6 @@ public class DefaultAppManager implements AppManager {
 				return true;
 			}
 		}
-		
 		return false;
 	}
 	
@@ -137,7 +131,6 @@ public class DefaultAppManager implements AppManager {
 				try {
 					String folderPath = getAppFolderPath() + File.separator + app.getFolderName();
 					FileUtils.forceDelete(new File(folderPath));
-					
 					return true;
 				}
 				catch (IOException ex) {
@@ -171,7 +164,6 @@ public class DefaultAppManager implements AppManager {
 				log.error(ex.getLocalizedMessage(), ex);
 			}
 		}
-		
 		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(KEY_APP_FOLDER_PATH, appFolderPath));
 	}
 	
@@ -192,7 +184,7 @@ public class DefaultAppManager implements AppManager {
 	
 	@Override
 	public void setAppStoreUrl(String appStoreUrl) {
-		//appSettingManager.saveSystemSetting(KEY_APP_STORE_URL, appStoreUrl);
+		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(KEY_APP_STORE_URL, appStoreUrl));
 	}
 	
 	// -------------------------------------------------------------------------
@@ -202,7 +194,7 @@ public class DefaultAppManager implements AppManager {
 	 * Sets the list of apps with detected apps from the file system.
 	 */
 	@Override
-    public void reloadApps() {
+        public void reloadApps() {
         List<App> appList = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -221,26 +213,21 @@ public class DefaultAppManager implements AppManager {
                                 app.setFolderName(folder.getName());
                                 appList.add(app);
                             } catch (IOException ex) {
-                                log.error(ex.getLocalizedMessage(), ex);
+                                log.error("app manifest is non-standard", ex);
                             }
                         } else {
-                            System.out.println(">>>>>>>>>>>>>>MANIFEST NOT FOUND!!");
+                            log.error("app doesn't have a manifest");
                         }
                     }
                 }
             } else {
-                System.out.println(">>>>>>>>> NOT A DIRECTORY");
+                log.error("appFolder settings is not a directory");
             }
         } else {
-            System.out.println(">>>>>>>>>>>> APP FOLDER NULL!!");
+            log.error("Incorrect appFolder Path");
         }
 
         this.apps = appList;
-        System.out.println("FOUND TOTAL APPS = " + appList.size());
-        for (App app : appList) {
-            System.out.println(">>>>>>>>>>>>>>>APPS = " + app.getName());
-        }
-
         log.info("Detected apps: " + apps);
     }
 }

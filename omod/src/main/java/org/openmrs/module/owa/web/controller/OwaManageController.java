@@ -8,7 +8,6 @@ package org.openmrs.module.owa.web.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.owa.AppManager;
-import org.openmrs.module.owa.impl.DefaultAppManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -29,10 +28,9 @@ public class OwaManageController {
 	@RequestMapping(value = "/module/owa/manage", method = RequestMethod.GET)
 	public void manage(ModelMap model) {
 		appManager.reloadApps();
-		System.out.println("INSIDE MANAGE");
-		System.out.println("APP FOLDER PATH = " + appManager.getAppFolderPath());
-		System.out.println("APP BASE URL = " + appManager.getAppBaseUrl());
-		System.out.println("APPSTORE URL = " + appManager.getAppStoreUrl());
-		System.out.println("AppList = " + appManager.getApps().size());
+		log.info("APP FOLDER PATH = " + appManager.getAppFolderPath());
+		log.info("APP BASE URL = " + appManager.getAppBaseUrl());
+		log.info("APPSTORE URL = " + appManager.getAppStoreUrl());
+		log.info("AppList = " + appManager.getApps().size());
 	}
 }
