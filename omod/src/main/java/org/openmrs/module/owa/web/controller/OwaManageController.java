@@ -5,8 +5,10 @@
  */
 package org.openmrs.module.owa.web.controller;
 
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,17 +22,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class OwaManageController {
 	
-	protected final Log log = LogFactory.getLog(getClass());
+	protected final Log log = LogFactory.getLog(OwaManageController.class);
 	
 	@Autowired
 	AppManager appManager;
 	
+	List<App> appList;
+	
 	@RequestMapping(value = "/module/owa/manage", method = RequestMethod.GET)
 	public void manage(ModelMap model) {
 		appManager.reloadApps();
-		log.info("APP FOLDER PATH = " + appManager.getAppFolderPath());
-		log.info("APP BASE URL = " + appManager.getAppBaseUrl());
-		log.info("APPSTORE URL = " + appManager.getAppStoreUrl());
-		log.info("AppList = " + appManager.getApps().size());
+		appList = appManager.getApps();
+		System.out.println("APP FOLDER PATH = " + appManager.getAppFolderPath());
+		System.out.println("APP BASE URL = " + appManager.getAppBaseUrl());
+		System.out.println("APPSTORE URL = " + appManager.getAppStoreUrl());
+		System.out.println("AppList = " + appManager.getApps().size());
 	}
 }

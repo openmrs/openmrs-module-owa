@@ -201,7 +201,6 @@ public class DefaultAppManager implements AppManager {
 
         if (null != getAppFolderPath()) {
             File appFolderPath = new File(getAppFolderPath());
-            System.out.println("APPFOLDER PATH = " + getAppFolderPath());
             if (appFolderPath.isDirectory()) {
                 File[] listFiles = appFolderPath.listFiles();
                 for (File folder : listFiles) {

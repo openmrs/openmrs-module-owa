@@ -1,10 +1,6 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
 <%@ include file="/WEB-INF/template/header.jsp"%>
-
 <%@ include file="template/localHeader.jsp"%>
-
-<p>Hello ${user.systemId}! 5666</p>
-
 
 <style type="text/css">
     #uploadArea {
@@ -32,38 +28,53 @@
 
 <div>
     <%--#if( ${settingsValid} == true )--%>
-    <div id="uploadArea">
-        <form id="uploadPackageForm" enctype="multipart/form-data" method="post">
-            <span style="margin-right: 30px"><spring:message code="owa.upload_app_package" />:</span>
-            <input type="file" id="upload" name="upload" accept="application/zip,.zip" />
-        </form>
-    </div>
-    <div id="progressbar"></div>
-    <%--#else--%>
-    <div id="uploadArea">Please configure the <a href="appSettings.action">app settings</a> before installing apps</div>
-    <%--#end--%>
+    <c:choose>
+        <c:when test="${settingsValid == true}">
+            <div id="uploadArea">
+                <form id="uploadPackageForm" enctype="multipart/form-data" method="post">
+                    <span style="margin-right: 30px"><spring:message code="owa.upload_app_package" />:</span>
+                    <input type="file" id="upload" name="upload" accept="application/zip,.zip" />
+                </form>
+            </div>
+            <div id="progressbar"></div>
+            <%--#else--%>
+        </c:when>
+        <c:otherwise>
+            <div id="uploadArea">Please configure the <a href="appSettings.action">app settings</a> before installing apps</div>
+            <%--#end--%>
+        </c:otherwise>
+    </c:choose>
 </div>
 
 <%--#if( $!appStoreUrl )--%>
-<div id="appStoreLink">Look for more apps in the <a href="${appStoreUrl}" target="_blank">app store</a></div>
-<%--#end--%>
+<c:if test="${empty appStoreUrl}">
+    <div id="appStoreLink">Look for more apps in the <a href="${appStoreUrl}" target="_blank">app store</a></div>
+    <%--#end--%>
+</c:if>
 
 <ul class="introList">
+    <%--c:choose>
     <%--#if( $appList.isEmpty() )--%>
-    <li style="margin-left: 15px; margin-top: 6px;"><spring:message code="owa.you_have_no_apps_installed" /></li>
-        <%--#else--%>
-        <%--#foreach( $app in $appList )--%>
-    <li class="introItem" onclick="window.location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
-        <span class="introItemHeader">
-            <img style="float:left; margin-right:15px" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
-            ${app.name}
-        </span><br>
-        <spring:message code="owa.author" />: ${app.developer.name}<br>
-        <spring:message code="owa.version" />: ${app.version}
-    </li>
+    <%--c:when test="${appList.isEmpty()}">
+        <li style="margin-left: 15px; margin-top: 6px;"><spring:message code="owa.you_have_no_apps_installed" /></li>
+        </c:when>
+        <c:otherwise>
+    <%--#else--%>
+    <%--#foreach( $app in $appList )--%>
+    <c:forEach items="${appList}" var="app">
+        <li class="introItem" onclick="window.location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
+            <span class="introItemHeader">
+                <img style="float:left; margin-right:15px" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
+                ${app.name}
+            </span><br>
+            <spring:message code="owa.author" />: ${app.developer.name}<br>
+            <spring:message code="owa.version" />: ${app.version}
+        </li>
+    </c:forEach>
+    <%--/c:otherwise>
+</c:choose>
     <%--#end
     #end--%>
 </ul>
-
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>

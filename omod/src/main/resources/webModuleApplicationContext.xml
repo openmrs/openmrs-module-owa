@@ -22,10 +22,6 @@
 
     <!-- Add here beans related to the web context -->
 
-    <!-- Annotation based controllers -->
-    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
-        
-    <context:component-scan base-package="org.openmrs.module.owa.web.controller" />
-    <bean id="org.hisp.dhis.appmanager.AppManager" class="org.openmrs.module.owa.impl.DefaultAppManager" />
+    <bean id="org.openmrs.module.owa.AppManager" class="org.openmrs.module.owa.impl.DefaultAppManager" />
 
 </beans>
