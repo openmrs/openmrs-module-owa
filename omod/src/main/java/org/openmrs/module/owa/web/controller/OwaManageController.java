@@ -5,14 +5,18 @@
  */
 package org.openmrs.module.owa.web.controller;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -27,15 +31,34 @@ public class OwaManageController {
 	@Autowired
 	AppManager appManager;
 	
-	List<App> appList;
-	
+	@ModelAttribute("appList")
 	@RequestMapping(value = "/module/owa/manage", method = RequestMethod.GET)
-	public void manage(ModelMap model) {
+	public List<App> manage(ModelMap model) {
 		appManager.reloadApps();
-		appList = appManager.getApps();
-		System.out.println("APP FOLDER PATH = " + appManager.getAppFolderPath());
-		System.out.println("APP BASE URL = " + appManager.getAppBaseUrl());
-		System.out.println("APPSTORE URL = " + appManager.getAppStoreUrl());
-		System.out.println("AppList = " + appManager.getApps().size());
+		List<App> appList = appManager.getApps();
+		return appList;
+	}
+	
+	@ModelAttribute("settingsValid")
+	public boolean settingsValid() {
+		boolean settingsValid = false;
+		String appFolderPath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_FOLDER_PATH);
+		if (null != appFolderPath) {
+			File file = new File(appFolderPath);
+			if (file.isDirectory() && Files.isWritable(file.toPath())) {
+				settingsValid = true;
+			}
+		}
+		return settingsValid;
+	}
+	
+	@ModelAttribute("appBaseUrl")
+	public String getAppBaseUrl() {
+		return Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL);
+	}
+        
+        @ModelAttribute("appStoreUrl")
+	public String getStoreUrl() {
+		return Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_STORE_URL);
 	}
 }

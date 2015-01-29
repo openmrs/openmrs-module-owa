@@ -24,10 +24,18 @@
         width: auto;
         max-width: 460px;
     }
+    .introItem{
+        padding: 20px 10px;
+        width: 150px;
+        min-height: 90px;
+        vertical-align: top;
+        line-height: 1.3em;
+        margin: 10px;
+        text-align: center;
+    }
 </style>
 
 <div>
-    <%--#if( ${settingsValid} == true )--%>
     <c:choose>
         <c:when test="${settingsValid == true}">
             <div id="uploadArea">
@@ -37,44 +45,35 @@
                 </form>
             </div>
             <div id="progressbar"></div>
-            <%--#else--%>
         </c:when>
         <c:otherwise>
-            <div id="uploadArea">Please configure the <a href="appSettings.action">app settings</a> before installing apps</div>
-            <%--#end--%>
+            <div id="uploadArea">Please configure the <a href="../../admin/maintenance/globalProps.form">app settings</a> before installing apps</div>
         </c:otherwise>
     </c:choose>
 </div>
 
-<%--#if( $!appStoreUrl )--%>
 <c:if test="${empty appStoreUrl}">
     <div id="appStoreLink">Look for more apps in the <a href="${appStoreUrl}" target="_blank">app store</a></div>
-    <%--#end--%>
 </c:if>
 
 <ul class="introList">
-    <%--c:choose>
-    <%--#if( $appList.isEmpty() )--%>
-    <%--c:when test="${appList.isEmpty()}">
-        <li style="margin-left: 15px; margin-top: 6px;"><spring:message code="owa.you_have_no_apps_installed" /></li>
-        </c:when>
-        <c:otherwise>
-    <%--#else--%>
-    <%--#foreach( $app in $appList )--%>
-    <c:forEach items="${appList}" var="app">
-        <li class="introItem" onclick="window.location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
-            <span class="introItemHeader">
-                <img style="float:left; margin-right:15px" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
-                ${app.name}
-            </span><br>
-            <spring:message code="owa.author" />: ${app.developer.name}<br>
-            <spring:message code="owa.version" />: ${app.version}
-        </li>
-    </c:forEach>
-    <%--/c:otherwise>
-</c:choose>
-    <%--#end
-    #end--%>
+    <c:choose>
+        <c:when test="${empty appList}">
+            <li style="margin-left: 15px; margin-top: 6px;"><spring:message code="owa.you_have_no_apps_installed" /></li>
+            </c:when>
+            <c:otherwise>
+                <c:forEach items="${appList}" var="app">
+                <li class="introItem" onclick="window.location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
+                    <span class="introItemHeader">
+                        <img style="float:left; margin-right:15px" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
+                        ${app.name}
+                    </span><br>
+                    <spring:message code="owa.author" />: ${app.developer.name}<br>
+                    <spring:message code="owa.version" />: ${app.version}
+                </li>
+            </c:forEach>
+        </c:otherwise>
+    </c:choose>
 </ul>
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>
