@@ -28,15 +28,26 @@ package org.openmrs.module.owa.web.controller;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.messagesource.MessageSourceService;
 import org.openmrs.module.owa.AppManager;
+import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author Saptarshi Purkayastha
@@ -46,78 +57,78 @@ public class AddAppController {
 	
 	private static final Log log = LogFactory.getLog(AddAppController.class);
 	
-	private static final String FAILURE = "failure";
+	@Autowired
+	private MessageSourceService messageSourceService;
 	
-	//@Autowired
-	//private AppManager appManager;
+	@Autowired
+	private AppManager appManager;
 	
 	// -------------------------------------------------------------------------
 	// Input & Output
 	// -------------------------------------------------------------------------
-	private File file;
-	
-	public void setUpload(File file) {
-		this.file = file;
-	}
-	
-	private String fileName;
-	
-	public void setUploadFileName(String fileName) {
-		this.fileName = fileName;
-	}
-	
 	private String message;
 	
-	public String getMessage() {
-		return message;
+	private File multipartToFile(MultipartFile multipart) throws IllegalStateException, IOException {
+		File convFile = new File(multipart.getOriginalFilename());
+		multipart.transferTo(convFile);
+		return convFile;
 	}
 	
 	// -------------------------------------------------------------------------
 	// Action implementation
 	// -------------------------------------------------------------------------
-	@RequestMapping(value = "/module/owa/addApp", method = RequestMethod.GET)
-	public void execute() {
-		/*HttpServletRequest request = Context.getC..getRequest();
+	@RequestMapping(value = "/module/owa/addApp", method = RequestMethod.POST)
+	public @ResponseBody
+	String upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
+		if (!file.isEmpty()) {
+			String fileName = file.getOriginalFilename();
+			File uploadedFile = multipartToFile(file);
+			if (uploadedFile == null) {
+				message = messageSourceService.getMessage("owa.no_file_specified");
+				log.warn("No file specified");
+				return message;
+			} else if (new ZipInputStream(new FileInputStream(uploadedFile)).getNextEntry() == null) {
+				message = messageSourceService.getMessage("owa.not_a_zip");
+				log.warn("App is not a zip archive");
+				return message;
+			} else {
+				ZipFile zip = new ZipFile(uploadedFile);
+				ZipEntry entry = zip.getEntry("manifest.webapp");
+				if (entry == null) {
+					zip.close();
+					message = messageSourceService.getMessage("owa.manifest_not_found");
+					log.warn("Manifest file could not be found in app");
+					return message;
+				} else {
+					String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
+					        + request.getServerPort() + request.getContextPath();
+					appManager.installApp(uploadedFile, fileName, contextPath);
+				}
+				
+				/*try {
+				 String contextPath = Context.getContextPath(request);
 
-		 if (file == null) {
-		 message = i18n.getString("appmanager_no_file_specified");
-		 log.warn("No file specified");
-		 return FAILURE;
-		 }
+				 appManager.installApp(file, fileName, contextPath);
 
-		 if (!StreamUtils.isZip(new BufferedInputStream(new FileInputStream(file)))) {
-		 message = i18n.getString("appmanager_not_zip");
-		 log.warn("App is not a zip archive");
-		 return FAILURE;
-		 }
+				 message = messageSourceService.getMessage("appmanager_install_success");
 
-		 try (ZipFile zip = new ZipFile(file)) {
-		 ZipEntry entry = zip.getEntry("manifest.webapp");
-
-		 if (entry == null) {
-		 zip.close();
-		 message = i18n.getString("appmanager_manifest_not_found");
-		 log.warn("Manifest file could not be found in app");
-		 return FAILURE;
-		 }
-
-		 try {
-		 String contextPath = Context.getContextPath(request);
-
-		 appManager.installApp(file, fileName, contextPath);
-
-		 message = i18n.getString("appmanager_install_success");
-
-		 return SUCCESS;
-		 } catch (JsonParseException ex) {
-		 message = i18n.getString("appmanager_invalid_json");
-		 log.error("Error parsing JSON in manifest", ex);
-		 return FAILURE;
-		 } catch (IOException ex) {
-		 message = i18n.getString("appmanager_could_not_read_file_check_server_permissions");
-		 log.error("App could not not be read, check server permissions");
-		 return FAILURE;
-		 }
-		 }*/
+				 return SUCCESS;
+				 } catch (JsonParseException ex) {
+				 message = messageSourceService.getMessage("appmanager_invalid_json");
+				 log.error("Error parsing JSON in manifest", ex);
+				 return FAILURE;
+				 } catch (IOException ex) {
+				 message = messageSourceService.getMessage("appmanager_could_not_read_file_check_server_permissions");
+				 log.error("App could not not be read, check server permissions");
+				 return FAILURE;
+				 }*/
+			}
+			
+		} else {
+			message = messageSourceService.getMessage("owa.blank_zip");
+			log.warn("App is not a zip archive");
+			return message;
+		}
+		return "SUCCESS";
 	}
 }

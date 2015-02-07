@@ -56,8 +56,8 @@ public class OwaManageController {
 	public String getAppBaseUrl() {
 		return Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL);
 	}
-        
-        @ModelAttribute("appStoreUrl")
+	
+	@ModelAttribute("appStoreUrl")
 	public String getStoreUrl() {
 		return Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_STORE_URL);
 	}

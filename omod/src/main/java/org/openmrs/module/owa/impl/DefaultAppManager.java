@@ -75,7 +75,7 @@ public class DefaultAppManager implements AppManager {
 	}
 	
 	@Override
-        public void installApp(File file, String fileName, String rootPath) throws IOException {
+    public void installApp(File file, String fileName, String rootPath) throws IOException {
         try (ZipFile zip = new ZipFile(file)) {
             ZipEntry entry = zip.getEntry("manifest.webapp");
 
@@ -88,12 +88,13 @@ public class DefaultAppManager implements AppManager {
             // ---------------------------------------------------------------------
             // Delete if app is already installed
             // ---------------------------------------------------------------------
+            String dest = getAppFolderPath() + File.separator + fileName.substring(0, fileName.lastIndexOf('.'));
+
             if (getApps().contains(app)) {
-                String folderPath = getAppFolderPath() + File.separator + app.getFolderName();
+                String folderPath = getAppFolderPath() + File.separator + dest;
                 FileUtils.forceDelete(new File(folderPath));
             }
 
-            String dest = getAppFolderPath() + File.separator + fileName.substring(0, fileName.lastIndexOf('.'));
             Unzip unzip = new Unzip();
             unzip.setSrc(file);
             unzip.setDest(new File(dest));
@@ -105,10 +106,13 @@ public class DefaultAppManager implements AppManager {
             File updateManifest = new File(dest + File.separator + "manifest.webapp");
             App installedApp = mapper.readValue(updateManifest, App.class);
 
+            installedApp.setBaseUrl(getAppBaseUrl());
+            installedApp.setFolderName(fileName.substring(0, fileName.lastIndexOf('.')));
+
             if (installedApp.getActivities().getOpenmrs().getHref().equals("*")) {
                 installedApp.getActivities().getOpenmrs().setHref(rootPath);
-                mapper.writeValue(updateManifest, installedApp);
             }
+            mapper.writeValue(updateManifest, installedApp);
         }
 
         reloadApps(); // Reload app state
@@ -194,7 +198,7 @@ public class DefaultAppManager implements AppManager {
 	 * Sets the list of apps with detected apps from the file system.
 	 */
 	@Override
-        public void reloadApps() {
+    public void reloadApps() {
         List<App> appList = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);

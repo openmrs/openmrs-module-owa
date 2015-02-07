@@ -62,15 +62,13 @@ public class FileServlet extends HttpServlet {
 	 */
 	@Override
 	public void init() throws ServletException {
-		
 		// Validate base path.
 		if (this.basePath == null) {
 			throw new ServletException("FileServlet init param 'basePath' is required.");
 		} else {
 			File path = new File(this.basePath);
 			if (!path.exists()) {
-				throw new ServletException("FileServlet init param 'basePath' value '" + this.basePath
-				        + "' does actually not exist in file system.");
+				path.mkdir();
 			} else if (!path.isDirectory()) {
 				throw new ServletException("FileServlet init param 'basePath' value '" + this.basePath
 				        + "' is actually not a directory in file system.");

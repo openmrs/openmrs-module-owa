@@ -92,7 +92,6 @@ public class App implements Serializable {
 		if (baseUrl != null && folderName != null && launchPath != null) {
 			return baseUrl + "/" + folderName + "/" + launchPath;
 		}
-		
 		return null;
 	}
 	

@@ -39,9 +39,10 @@
     <c:choose>
         <c:when test="${settingsValid == true}">
             <div id="uploadArea">
-                <form id="uploadPackageForm" enctype="multipart/form-data" method="post">
+                <form id="uploadPackageForm" enctype="multipart/form-data" method="post" action="addApp.htm">
                     <span style="margin-right: 30px"><spring:message code="owa.upload_app_package" />:</span>
-                    <input type="file" id="upload" name="upload" accept="application/zip,.zip" />
+                    <input type="file" id="file" name="file" accept="application/zip,.zip" />
+                    <input type="submit"/>
                 </form>
             </div>
             <div id="progressbar"></div>
