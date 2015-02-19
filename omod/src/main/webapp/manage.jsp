@@ -35,6 +35,8 @@
     }
 </style>
 
+<script src="javascript/deleteApp.js"></script>
+
 <div>
     <c:choose>
         <c:when test="${settingsValid == true}">
@@ -65,12 +67,25 @@
             <c:otherwise>
                 <c:forEach items="${appList}" var="app">
                 <li class="introItem" onclick="window.location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
-                    <span class="introItemHeader">
-                        <img style="float:left; margin-right:15px" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
-                        ${app.name}
-                    </span><br>
-                    <spring:message code="owa.author" />: ${app.developer.name}<br>
-                    <spring:message code="owa.version" />: ${app.version}
+                    <table border='0'>
+                        <tr>
+                            <td>
+                                <span class="introItemHeader">
+                                    <img style="float:left; margin-right:15px" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
+                                </span>
+                            </td>
+                            <td>
+                                <div>
+                                    ${app.name}<br/>
+                                    <spring:message code="owa.author" />: ${app.developer.name}<br>
+                                    <spring:message code="owa.version" />: ${app.version}
+                                </div>
+                            </td>
+                            <td><input type="button" value="Delete" style="width:120px" onclick="deleteApp(${app.name})" /></td>
+                        </tr>
+                    </table>
+                    <br>
+                   
                 </li>
             </c:forEach>
         </c:otherwise>

@@ -34,12 +34,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.io.FileUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.messagesource.MessageSourceService;
 import org.openmrs.module.owa.AppManager;
-import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Controller;
@@ -68,12 +68,6 @@ public class AddAppController {
 	// -------------------------------------------------------------------------
 	private String message;
 	
-	private File multipartToFile(MultipartFile multipart) throws IllegalStateException, IOException {
-		File convFile = new File(multipart.getOriginalFilename());
-		multipart.transferTo(convFile);
-		return convFile;
-	}
-	
 	// -------------------------------------------------------------------------
 	// Action implementation
 	// -------------------------------------------------------------------------
@@ -82,8 +76,9 @@ public class AddAppController {
 	String upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
 		if (!file.isEmpty()) {
 			String fileName = file.getOriginalFilename();
-			File uploadedFile = multipartToFile(file);
-			if (uploadedFile == null) {
+			File uploadedFile = new File(file.getOriginalFilename());
+			file.transferTo(uploadedFile);
+			if (null == uploadedFile) {
 				message = messageSourceService.getMessage("owa.no_file_specified");
 				log.warn("No file specified");
 				return message;
@@ -104,25 +99,8 @@ public class AddAppController {
 					        + request.getServerPort() + request.getContextPath();
 					appManager.installApp(uploadedFile, fileName, contextPath);
 				}
-				
-				/*try {
-				 String contextPath = Context.getContextPath(request);
-
-				 appManager.installApp(file, fileName, contextPath);
-
-				 message = messageSourceService.getMessage("appmanager_install_success");
-
-				 return SUCCESS;
-				 } catch (JsonParseException ex) {
-				 message = messageSourceService.getMessage("appmanager_invalid_json");
-				 log.error("Error parsing JSON in manifest", ex);
-				 return FAILURE;
-				 } catch (IOException ex) {
-				 message = messageSourceService.getMessage("appmanager_could_not_read_file_check_server_permissions");
-				 log.error("App could not not be read, check server permissions");
-				 return FAILURE;
-				 }*/
 			}
+			FileUtils.deleteQuietly(uploadedFile);
 			
 		} else {
 			message = messageSourceService.getMessage("owa.blank_zip");
