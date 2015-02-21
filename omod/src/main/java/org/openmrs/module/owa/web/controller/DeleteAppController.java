@@ -27,10 +27,12 @@
  */
 package org.openmrs.module.owa.web.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import org.openmrs.module.owa.AppManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author Saptarshi Purkayastha
@@ -47,12 +49,6 @@ public class DeleteAppController {
 	// -------------------------------------------------------------------------
 	// Input & Output
 	// -------------------------------------------------------------------------
-	private String appName;
-	
-	public void setAppName(String appName) {
-		this.appName = appName;
-	}
-	
 	private String message;
 	
 	public String getMessage() {
@@ -63,11 +59,18 @@ public class DeleteAppController {
 	// Action implementation
 	// -------------------------------------------------------------------------
 	@RequestMapping(value = "/module/owa/deleteApp", method = RequestMethod.GET)
-	public String execute() throws Exception {
-		if (appName != null && appManager.deleteApp(appName)) {
+	public String execute(@RequestParam("appName") String appName) throws Exception {
+		
+		System.out.println("inside deleteAppController ");
+		System.out.println("appName " + appName);
+		if (appName != null) {
+			System.out.println("isAppDeleted ");
+			//boolean isAppDeleted = appManager.deleteApp(appName);
+			//System.out.println("isAppDeleted " + isAppDeleted);
 			//message = i18n.getString("appmanager_delete_success");
 		}
 		
-		return "";
+		return "SUCCESS";
+		
 	}
 }

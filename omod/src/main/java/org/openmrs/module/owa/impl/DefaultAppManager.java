@@ -130,9 +130,11 @@ public class DefaultAppManager implements AppManager {
 	
 	@Override
 	public boolean deleteApp(String name) {
+		System.out.println("app name in app manager " + name);
 		for (App app : getApps()) {
 			if (app.getName().equals(name) || app.getFolderName().equals(name)) {
 				try {
+					System.out.println("deleting app " + name);
 					String folderPath = getAppFolderPath() + File.separator + app.getFolderName();
 					FileUtils.forceDelete(new File(folderPath));
 					return true;

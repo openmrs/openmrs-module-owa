@@ -34,8 +34,8 @@
         text-align: center;
     }
 </style>
-
-<script src="javascript/deleteApp.js"></script>
+<openmrs:htmlInclude file="/moduleResources/owa/javascript/jquery-2.1.3.min.js"/>
+<openmrs:htmlInclude file="/moduleResources/owa/javascript/deleteApp.js"/>
 
 <div>
     <c:choose>
@@ -66,8 +66,7 @@
             </c:when>
             <c:otherwise>
                 <c:forEach items="${appList}" var="app">
-                <li class="introItem" onclick="window.location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
-                    <table border='0'>
+                    <table border='0' width="100%">
                         <tr>
                             <td>
                                 <span class="introItemHeader">
@@ -75,18 +74,16 @@
                                 </span>
                             </td>
                             <td>
-                                <div>
-                                    ${app.name}<br/>
+                                <div width="100%" align="left">
+                                    <a href="${appBaseUrl}/${app.folderName}/${app.launchPath}">${app.name}</a><br/>
                                     <spring:message code="owa.author" />: ${app.developer.name}<br>
                                     <spring:message code="owa.version" />: ${app.version}
                                 </div>
                             </td>
-                            <td><input type="button" value="Delete" style="width:120px" onclick="deleteApp(${app.name})" /></td>
+                            <td><input type="button" value="Delete" style="width:60px" onclick="deleteApp('${app.name}')" /></td>
                         </tr>
                     </table>
                     <br>
-                   
-                </li>
             </c:forEach>
         </c:otherwise>
     </c:choose>
