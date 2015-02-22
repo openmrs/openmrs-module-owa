@@ -40,8 +40,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.DeserializationConfig;
-
 import org.codehaus.jackson.map.ObjectMapper;
+
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.owa.App;
@@ -82,35 +82,40 @@ public class DefaultAppManager implements AppManager {
             try (InputStream inputStream = zip.getInputStream(entry)) {
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                
+
                 App app = mapper.readValue(inputStream, App.class);
-                
+
                 // ---------------------------------------------------------------------
                 // Delete if app is already installed
                 // ---------------------------------------------------------------------
                 String dest = getAppFolderPath() + File.separator + fileName.substring(0, fileName.lastIndexOf('.'));
-                
+
                 if (getApps().contains(app)) {
                     deleteApp(app.getName());
                 }
-                
+
                 Unzip unzip = new Unzip();
                 unzip.setSrc(file);
                 unzip.setDest(new File(dest));
                 unzip.execute();
-                
+
                 // ---------------------------------------------------------------------
                 // Set openmrs server location
                 // ---------------------------------------------------------------------
                 File updateManifest = new File(dest + File.separator + "manifest.webapp");
                 App installedApp = mapper.readValue(updateManifest, App.class);
-                
+
                 installedApp.setBaseUrl(getAppBaseUrl());
                 installedApp.setFolderName(fileName.substring(0, fileName.lastIndexOf('.')));
-                
-                if (installedApp.getActivities().getOpenmrs().getHref().equals("*")) {
-                    installedApp.getActivities().getOpenmrs().setHref(rootPath);
+
+                if (null != installedApp.getActivities() && null != installedApp.getActivities().getOpenmrs()) {
+                    if (null != installedApp.getActivities().getOpenmrs().getHref()) {
+                        if (installedApp.getActivities().getOpenmrs().getHref().equals("*")) {
+                            installedApp.getActivities().getOpenmrs().setHref(rootPath);
+                        }
+                    }
                 }
+
                 mapper.writeValue(updateManifest, installedApp);
             }
         }
