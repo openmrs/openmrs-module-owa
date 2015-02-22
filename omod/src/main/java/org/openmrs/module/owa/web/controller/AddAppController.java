@@ -34,7 +34,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.io.FileUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +45,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -63,50 +61,43 @@ public class AddAppController {
 	@Autowired
 	private AppManager appManager;
 	
-	// -------------------------------------------------------------------------
-	// Input & Output
-	// -------------------------------------------------------------------------
 	private String message;
 	
-	// -------------------------------------------------------------------------
-	// Action implementation
-	// -------------------------------------------------------------------------
 	@RequestMapping(value = "/module/owa/addApp", method = RequestMethod.POST)
-	public @ResponseBody
-	String upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
-		if (!file.isEmpty()) {
-			String fileName = file.getOriginalFilename();
-			File uploadedFile = new File(file.getOriginalFilename());
-			file.transferTo(uploadedFile);
-			if (null == uploadedFile) {
-				message = messageSourceService.getMessage("owa.no_file_specified");
-				log.warn("No file specified");
-				return message;
-			} else if (new ZipInputStream(new FileInputStream(uploadedFile)).getNextEntry() == null) {
-				message = messageSourceService.getMessage("owa.not_a_zip");
-				log.warn("App is not a zip archive");
-				return message;
-			} else {
-				ZipFile zip = new ZipFile(uploadedFile);
-				ZipEntry entry = zip.getEntry("manifest.webapp");
-				if (entry == null) {
-					zip.close();
-					message = messageSourceService.getMessage("owa.manifest_not_found");
-					log.warn("Manifest file could not be found in app");
-					return message;
-				} else {
-					String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
-					        + request.getServerPort() + request.getContextPath();
-					appManager.installApp(uploadedFile, fileName, contextPath);
-				}
-			}
-			FileUtils.deleteQuietly(uploadedFile);
-			
-		} else {
-			message = messageSourceService.getMessage("owa.blank_zip");
-			log.warn("App is not a zip archive");
-			return message;
-		}
-		return "SUCCESS";
-	}
+    public String upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
+        if (!file.isEmpty()) {
+            String fileName = file.getOriginalFilename();
+            File uploadedFile = new File(file.getOriginalFilename());
+            file.transferTo(uploadedFile);
+            try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(uploadedFile))) {
+                if (zipStream.getNextEntry() == null) {
+                    message = messageSourceService.getMessage("owa.not_a_zip");
+                    log.warn("App is not a zip archive");
+                    uploadedFile.delete();
+                    return message;
+                } else {
+                    try (ZipFile zip = new ZipFile(uploadedFile)) {
+                        ZipEntry entry = zip.getEntry("manifest.webapp");
+                        if (entry == null) {
+                            message = messageSourceService.getMessage("owa.manifest_not_found");
+                            log.warn("Manifest file could not be found in app");
+                            uploadedFile.delete();
+                            return message;
+                        } else {
+                            String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
+                                    + request.getServerPort() + request.getContextPath();
+                            appManager.installApp(uploadedFile, fileName, contextPath);
+                        }
+                    }
+                }
+            }
+            uploadedFile.delete();
+            
+        } else {
+            message = messageSourceService.getMessage("owa.blank_zip");
+            log.warn("App is not a zip archive");
+            return message;
+        }
+        return "redirect:manage.form";
+    }
 }
