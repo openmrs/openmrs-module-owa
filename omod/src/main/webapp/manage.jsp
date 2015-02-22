@@ -25,14 +25,18 @@
         width: auto;
         max-width: 460px;
     }
-    .introItem{
+
+    .bigButton{
         padding: 20px 10px;
-        width: 150px;
+        width: 350px;
         min-height: 90px;
         vertical-align: top;
         line-height: 1.3em;
         margin: 10px;
         text-align: center;
+        border-radius: 5px;
+        background: -webkit-linear-gradient(top, #ffffff, #dddddd);
+        border: #dddddd 1px solid;
     }
 </style>
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/jquery-2.1.3.min.js"/>
@@ -66,28 +70,27 @@
             <li style="margin-left: 15px; margin-top: 6px;"><spring:message code="owa.you_have_no_apps_installed" /></li>
             </c:when>
             <c:otherwise>
+            <div>
                 <c:forEach items="${appList}" var="app">
-                <table border='0' width="100%">
-                    <tr>
-                        <td>
-                            <span class="introItemHeader">
+                    <div class="bigButton">
+                        <div style="cursor: pointer;" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
+                            <div class="introItemHeader">
                                 <img style="float:left; margin-right:15px" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
-                            </span>
-                        </td>
-                        <td>
+                            </div>
+
                             <div width="100%" align="left">
-                                <a href="${appBaseUrl}/${app.folderName}/${app.launchPath}">${app.name}</a><br/>
-                                <spring:message code="owa.author" />: ${app.developer.name}<br>
+                                <spring:message code="owa.author" />: ${app.name}<br/>
+                                <spring:message code="owa.author" />: ${app.developer.name}<br/>
                                 <spring:message code="owa.version" />: ${app.version}
                             </div>
-                        </td>
-                        <td>
+                        </div>
+                        <div style="padding-top: 20px;">
                             <input type="button" value="Delete" style="width:60px" onclick="deleteApp('${app.name}')" />
-                        </td>
-                    </tr>
-                </table>
-                <br>
-            </c:forEach>
+                        </div>
+                    </div>
+                </c:forEach>
+            </div>
+
         </c:otherwise>
     </c:choose>
 </ul>
