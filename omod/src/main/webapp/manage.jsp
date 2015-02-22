@@ -1,4 +1,5 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
+<openmrs:require privilege="Manage Open Web Apps" otherwise="/login.htm" redirect="/module/owa/manage.form" />
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="template/localHeader.jsp"%>
 
@@ -66,24 +67,26 @@
             </c:when>
             <c:otherwise>
                 <c:forEach items="${appList}" var="app">
-                    <table border='0' width="100%">
-                        <tr>
-                            <td>
-                                <span class="introItemHeader">
-                                    <img style="float:left; margin-right:15px" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
-                                </span>
-                            </td>
-                            <td>
-                                <div width="100%" align="left">
-                                    <a href="${appBaseUrl}/${app.folderName}/${app.launchPath}">${app.name}</a><br/>
-                                    <spring:message code="owa.author" />: ${app.developer.name}<br>
-                                    <spring:message code="owa.version" />: ${app.version}
-                                </div>
-                            </td>
-                            <td><input type="button" value="Delete" style="width:60px" onclick="deleteApp('${app.name}')" /></td>
-                        </tr>
-                    </table>
-                    <br>
+                <table border='0' width="100%">
+                    <tr>
+                        <td>
+                            <span class="introItemHeader">
+                                <img style="float:left; margin-right:15px" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
+                            </span>
+                        </td>
+                        <td>
+                            <div width="100%" align="left">
+                                <a href="${appBaseUrl}/${app.folderName}/${app.launchPath}">${app.name}</a><br/>
+                                <spring:message code="owa.author" />: ${app.developer.name}<br>
+                                <spring:message code="owa.version" />: ${app.version}
+                            </div>
+                        </td>
+                        <td>
+                            <input type="button" value="Delete" style="width:60px" onclick="deleteApp('${app.name}')" />
+                        </td>
+                    </tr>
+                </table>
+                <br>
             </c:forEach>
         </c:otherwise>
     </c:choose>

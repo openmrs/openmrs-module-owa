@@ -19,11 +19,14 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * The main controller.
  */
 @Controller
+@RequestMapping("/module/owa")
 public class OwaManageController {
 	
 	protected final Log log = LogFactory.getLog(OwaManageController.class);
@@ -32,11 +35,20 @@ public class OwaManageController {
 	AppManager appManager;
 	
 	@ModelAttribute("appList")
-	@RequestMapping(value = "/module/owa/manage", method = RequestMethod.GET)
+	@RequestMapping(value = "/manage", method = RequestMethod.GET)
 	public List<App> manage(ModelMap model) {
 		appManager.reloadApps();
 		List<App> appList = appManager.getApps();
 		return appList;
+	}
+	
+	@RequestMapping(value = "/deleteApp", method = RequestMethod.GET)
+	public String deleteApp(@RequestParam("appName") String appName, ModelMap model) {
+		if (appName != null) {
+			appManager.deleteApp(appName);
+		}
+		model.clear();
+		return "redirect:manage.form";
 	}
 	
 	@ModelAttribute("settingsValid")
