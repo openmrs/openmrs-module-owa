@@ -2,8 +2,8 @@
 <openmrs:require privilege="Manage Open Web Apps" otherwise="/login.htm" redirect="/module/owa/manage.form" />
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="template/localHeader.jsp"%>
-
 <style type="text/css">
+
     #uploadArea {
         border: 1px solid #ccc; 
         border-radius: 3px; 
@@ -25,15 +25,25 @@
         width: auto;
         max-width: 460px;
     }
-    .introItem{
+
+    .bigButton{
         padding: 20px 10px;
-        width: 150px;
+        width: 350px;
         min-height: 90px;
         vertical-align: top;
         line-height: 1.3em;
         margin: 10px;
         text-align: center;
+        border-radius: 5px;
+        background: -webkit-linear-gradient(top, #ffffff, #dddddd);
+        border: #dddddd 1px solid;
+    }   
+     
+    .appInfo{
+        text-align: justify;       
+        margin-left: 100px;
     }
+    
 </style>
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/jquery-2.1.3.min.js"/>
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/deleteApp.js"/>
@@ -45,7 +55,7 @@
                 <form id="uploadPackageForm" enctype="multipart/form-data" method="post" action="addApp.htm">
                     <span style="margin-right: 30px"><spring:message code="owa.upload_app_package" />:</span>
                     <input type="file" id="file" name="file" accept="application/zip,.zip" />
-                    <input type="submit"/>
+                    <input type="submit" value="Upload" style="margin-left: 150px;" />
                 </form>
             </div>
             <div id="progressbar"></div>
@@ -66,28 +76,25 @@
             <li style="margin-left: 15px; margin-top: 6px;"><spring:message code="owa.you_have_no_apps_installed" /></li>
             </c:when>
             <c:otherwise>
+            <div>
                 <c:forEach items="${appList}" var="app">
-                <table border='0' width="100%">
-                    <tr>
-                        <td>
-                            <span class="introItemHeader">
-                                <img style="float:left; margin-right:15px" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
-                            </span>
-                        </td>
-                        <td>
-                            <div width="100%" align="left">
-                                <a href="${appBaseUrl}/${app.folderName}/${app.launchPath}">${app.name}</a><br/>
-                                <spring:message code="owa.author" />: ${app.developer.name}<br>
-                                <spring:message code="owa.version" />: ${app.version}
+                    <div class="bigButton">
+                        <div style="cursor: pointer;" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
+                            <div class="introItemHeader">
+                                <img style="float:left;margin-right:15px;max-height:50px;max-width:50px;" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
                             </div>
-                        </td>
-                        <td>
+                            <div class="appInfo" >
+                                <spring:message code="owa.name" />: ${app.name}<br/>
+                                <spring:message code="owa.author" />: ${app.developer.name}<br/>
+                                <spring:message code="owa.version" />: ${app.version} <br/>
+                            </div>
+                        </div>
+                        <div style="padding-top: 20px;">
                             <input type="button" value="Delete" style="width:60px" onclick="deleteApp('${app.name}')" />
-                        </td>
-                    </tr>
-                </table>
-                <br>
-            </c:forEach>
+                        </div>
+                    </div>
+                </c:forEach>
+            </div>
         </c:otherwise>
     </c:choose>
 </ul>
