@@ -2,8 +2,8 @@
 <openmrs:require privilege="Manage Open Web Apps" otherwise="/login.htm" redirect="/module/owa/manage.form" />
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="template/localHeader.jsp"%>
-
 <style type="text/css">
+
     #uploadArea {
         border: 1px solid #ccc; 
         border-radius: 3px; 
@@ -37,7 +37,13 @@
         border-radius: 5px;
         background: -webkit-linear-gradient(top, #ffffff, #dddddd);
         border: #dddddd 1px solid;
+    }   
+     
+    .appInfo{
+        text-align: justify;       
+        margin-left: 100px;
     }
+    
 </style>
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/jquery-2.1.3.min.js"/>
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/deleteApp.js"/>
@@ -49,7 +55,7 @@
                 <form id="uploadPackageForm" enctype="multipart/form-data" method="post" action="addApp.htm">
                     <span style="margin-right: 30px"><spring:message code="owa.upload_app_package" />:</span>
                     <input type="file" id="file" name="file" accept="application/zip,.zip" />
-                    <input type="submit"/>
+                    <input type="submit" value="Upload" style="margin-left: 150px;" />
                 </form>
             </div>
             <div id="progressbar"></div>
@@ -75,13 +81,12 @@
                     <div class="bigButton">
                         <div style="cursor: pointer;" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
                             <div class="introItemHeader">
-                                <img style="float:left; margin-right:15px" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
+                                <img style="float:left;margin-right:15px;max-height:50px;max-width:50px;" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
                             </div>
-
-                            <div width="100%" align="left">
-                                <spring:message code="owa.author" />: ${app.name}<br/>
+                            <div class="appInfo" >
+                                <spring:message code="owa.name" />: ${app.name}<br/>
                                 <spring:message code="owa.author" />: ${app.developer.name}<br/>
-                                <spring:message code="owa.version" />: ${app.version}
+                                <spring:message code="owa.version" />: ${app.version} <br/>
                             </div>
                         </div>
                         <div style="padding-top: 20px;">
@@ -90,7 +95,6 @@
                     </div>
                 </c:forEach>
             </div>
-
         </c:otherwise>
     </c:choose>
 </ul>
