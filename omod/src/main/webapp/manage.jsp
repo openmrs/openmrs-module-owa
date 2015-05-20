@@ -25,23 +25,9 @@
         width: auto;
         max-width: 460px;
     }
-
-    .bigButton{
-        padding: 20px 10px;
-        width: 350px;
-        min-height: 90px;
-        vertical-align: top;
-        line-height: 1.3em;
-        margin: 10px;
-        text-align: center;
-        border-radius: 5px;
-        background: -webkit-linear-gradient(top, #ffffff, #dddddd);
-        border: #dddddd 1px solid;
-    }   
-     
-    .appInfo{
-        text-align: justify;       
-        margin-left: 100px;
+    
+    table{
+        width:100%;
     }
     
 </style>
@@ -77,22 +63,31 @@
             </c:when>
             <c:otherwise>
             <div>
+            <b class="boxHeader">Manage Apps</b>
                 <c:forEach items="${appList}" var="app">
-                    <div class="bigButton">
-                        <div style="cursor: pointer;" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
-                            <div class="introItemHeader">
-                                <img style="float:left;margin-right:15px;max-height:50px;max-width:50px;" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}">
-                            </div>
-                            <div class="appInfo" >
-                                <spring:message code="owa.name" />: ${app.name}<br/>
-                                <spring:message code="owa.author" />: ${app.developer.name}<br/>
-                                <spring:message code="owa.version" />: ${app.version} <br/>
-                            </div>
-                        </div>
-                        <div style="padding-top: 20px;">
-                            <input type="button" value="Delete" style="width:60px" onclick="deleteApp('${app.name}')" />
-                        </div>
-                    </div>
+                <div class="box" id="AppListing">
+                <table>
+                  <thead>
+                    <tr>                     
+                        <th>Logo</th>
+                        <th>Name</th>
+                        <th>Developer</th>
+                        <th>Version</th> 
+                        <th></th>                       
+                    </tr>
+                  </thead>
+                  <tbody style="cursor:pointer;">
+                    <tr>                      
+                        <td onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
+                         <img style="max-height:48px;max-width:48px;" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}"></td>            
+                        <td onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top">${app.name} </td>
+                        <td onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top">${app.developer.name}</td>
+                        <td onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top"> ${app.version}</td>              
+                        <td valign="top"><input type="button" value="Delete" onclick="deleteApp('${app.name}')" type="image"></td>
+                    </tr>
+                  </tbody>    
+                </table>
+                </div>
                 </c:forEach>
             </div>
         </c:otherwise>
