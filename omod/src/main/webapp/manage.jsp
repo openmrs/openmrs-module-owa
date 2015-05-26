@@ -2,6 +2,13 @@
 <openmrs:require privilege="Manage Open Web Apps" otherwise="/login.htm" redirect="/module/owa/manage.form" />
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="template/localHeader.jsp"%>
+<%@ page import="org.openmrs.web.WebConstants" %>
+<%
+pageContext.setAttribute("message", session.getAttribute(WebConstants.OPENMRS_MSG_ATTR));
+pageContext.setAttribute("error", session.getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
+session.removeAttribute(WebConstants.OPENMRS_MSG_ATTR);
+session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
+%>
 <style type="text/css">
 
     #uploadArea {
@@ -43,10 +50,18 @@
         text-align: justify;       
         margin-left: 100px;
     }
-    
+    	
 </style>
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/jquery-2.1.3.min.js"/>
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/deleteApp.js"/>
+
+<c:if test="${not empty error}">
+<div id="openmrs_error"><c:out value="${error}"></c:out></div>
+</c:if>
+
+<c:if test="${not empty message}">
+<div id="openmrs_msg"><c:out value="${message}"></c:out></div>
+</c:if>
 
 <div>
     <c:choose>
