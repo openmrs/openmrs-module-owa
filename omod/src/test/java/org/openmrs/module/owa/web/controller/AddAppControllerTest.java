@@ -5,15 +5,23 @@
  */
 package org.openmrs.module.owa.web.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URL;
+
 import javax.servlet.http.HttpServletRequest;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Before;
 import org.mockito.Mockito;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.messagesource.MessageSourceService;
+import org.openmrs.util.OpenmrsClassLoader;
+import org.openmrs.web.WebConstants;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockServletContext;
 
 /**
@@ -46,11 +54,44 @@ public class AddAppControllerTest extends BaseModuleWebContextSensitiveTest {
 	 * Test of upload method, of class AddAppController.
 	 */
 	@Test
-	public void testUpload() throws Exception {
-		System.out.println("upload");
+	public void testUploadofNotaZipArchieve() throws Exception {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/module/owa/addApp.htm");
-		AddAppController instance = new AddAppController();
-		String expResult = "";
+		URL url = OpenmrsClassLoader.getInstance().getResource("testing");
+		MockMultipartFile multifile = new MockMultipartFile("testFile", "testing", null, new FileInputStream(url.getFile()));
+		AddAppController controller = (AddAppController) applicationContext.getBean("addAppController");
+		controller.upload(multifile, request);
+		Assert.assertEquals(request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR), "owa.not_a_zip");
+	}
+	
+	@Test
+	public void testUploadofEmptyFile() throws Exception {
+		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/module/owa/addApp.htm");
+		URL url = OpenmrsClassLoader.getInstance().getResource("file");
+		MockMultipartFile multifile = new MockMultipartFile("testFile", "file", null, new FileInputStream(url.getFile()));
+		AddAppController controller = (AddAppController) applicationContext.getBean("addAppController");
+		controller.upload(multifile, request);
+		Assert.assertEquals(request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR), "owa.blank_zip");
+	}
+	
+	@Test
+	public void testUploadofZipFilewithoutManifest() throws Exception {
+		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/module/owa/addApp.htm");
+		FileInputStream file = new FileInputStream(new File("src/test/resources/Zipwithoutmanifest.zip"));
+		MockMultipartFile multifile = new MockMultipartFile("testFile", "Zipwithoutmanifest.zip", "application/zip,.zip",
+		        file);
+		AddAppController controller = (AddAppController) applicationContext.getBean("addAppController");
+		controller.upload(multifile, request);
+		Assert.assertEquals(request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR), "owa.manifest_not_found");
+	}
+	
+	@Test
+	public void testUploadofZipFilewithProperManifest() throws Exception {
+		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/module/owa/addApp.htm");
+		FileInputStream file = new FileInputStream(new File("src/test/resources/designer.zip"));
+		MockMultipartFile multifile = new MockMultipartFile("testFile", "designer.zip", "application/zip,.zip", file);
+		AddAppController controller = (AddAppController) applicationContext.getBean("addAppController");
+		controller.upload(multifile, request);
+		Assert.assertEquals(request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR), "owa.app_installed");
 	}
 	
 }
