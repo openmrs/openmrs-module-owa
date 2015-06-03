@@ -81,6 +81,10 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
     </c:choose>
 </div>
 
+<c:if test="${not empty message}">
+    <div id="errormessage" style="margin-left: 15px; margin-top: 6px;" >${message}</div>
+</c:if>
+
 <c:if test="${empty appStoreUrl}">
     <div id="appStoreLink">Look for more apps in the <a href="${appStoreUrl}" target="_blank">app store</a></div>
 </c:if>
