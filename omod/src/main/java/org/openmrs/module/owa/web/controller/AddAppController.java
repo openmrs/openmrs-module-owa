@@ -34,15 +34,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.messagesource.MessageSourceService;
 import org.openmrs.module.owa.AppManager;
+import org.openmrs.web.WebConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,7 +66,8 @@ public class AddAppController {
 	private String message;
 	
 	@RequestMapping(value = "/module/owa/addApp", method = RequestMethod.POST)
-    public String upload(@RequestParam("file") MultipartFile file, HttpServletRequest request, ModelMap model) throws IOException {
+    public String upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
+		HttpSession session = request.getSession();		
         if (!file.isEmpty()) {
             String fileName = file.getOriginalFilename();
             File uploadedFile = new File(file.getOriginalFilename());
@@ -75,8 +77,7 @@ public class AddAppController {
                     message = messageSourceService.getMessage("owa.not_a_zip");
                     log.warn("App is not a zip archive");
                     uploadedFile.delete();
-                    model.addAttribute("message", message);
-                    return "redirect:manage.form";
+                    session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);                
                 } else {
                     try (ZipFile zip = new ZipFile(uploadedFile)) {
                         ZipEntry entry = zip.getEntry("manifest.webapp");
@@ -84,12 +85,13 @@ public class AddAppController {
                             message = messageSourceService.getMessage("owa.manifest_not_found");
                             log.warn("Manifest file could not be found in app");
                             uploadedFile.delete();
-                            model.addAttribute("message", message);
-                            return "redirect:manage.form";
+                            session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);                       
                         } else {
                             String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
                                     + request.getServerPort() + request.getContextPath();
                             appManager.installApp(uploadedFile, fileName, contextPath);
+                            message = messageSourceService.getMessage("owa.app_installed");
+                            session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
                         }
                     }
                 }
@@ -98,9 +100,8 @@ public class AddAppController {
             
         } else {
             message = messageSourceService.getMessage("owa.blank_zip");
-            log.warn("Zip file is empty");
-            model.addAttribute("message", message);
-            return "redirect:manage.form";
+            log.warn("Zip file is empty");       
+            session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);    
         }
         return "redirect:manage.form";
     }
