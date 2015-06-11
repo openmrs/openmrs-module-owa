@@ -9,6 +9,17 @@ pageContext.setAttribute("error", session.getAttribute(WebConstants.OPENMRS_ERRO
 session.removeAttribute(WebConstants.OPENMRS_MSG_ATTR);
 session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
 %>
+
+<script type="text/javascript">
+    function validateForm() {
+    var file=document.forms["Form"]["file"].value;   
+    if (file==null || file=="") {
+      alert("<spring:message code="owa.attach_zip"/>");
+      return false;
+      }
+    }
+</script>
+
 <style type="text/css">
 
     #uploadArea {
@@ -53,7 +64,7 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
     <c:choose>
         <c:when test="${settingsValid == true}">
             <div id="uploadArea">
-                <form id="uploadPackageForm" enctype="multipart/form-data" method="post" action="addApp.htm">
+                <form id="uploadPackageForm" enctype="multipart/form-data" method="post" name="Form" onsubmit="return validateForm()" action="addApp.htm">
                     <span style="margin-right: 30px"><spring:message code="owa.upload_app_package" />:</span>
                     <input type="file" id="file" name="file" accept="application/zip,.zip" />
                     <input type="submit" value="Upload" style="margin-left: 150px;" />
