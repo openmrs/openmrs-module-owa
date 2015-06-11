@@ -28,11 +28,9 @@ package org.openmrs.module.owa.web.controller;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -71,38 +69,37 @@ public class AddAppController {
         if (!file.isEmpty()) {
             String fileName = file.getOriginalFilename();
             File uploadedFile = new File(file.getOriginalFilename());
-            file.transferTo(uploadedFile);
-            try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(uploadedFile))) {
-                if (zipStream.getNextEntry() == null) {
-                    message = messageSourceService.getMessage("owa.not_a_zip");
-                    log.warn("App is not a zip archive");
-                    uploadedFile.delete();
-                    session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);                
-                } else {
-                    try (ZipFile zip = new ZipFile(uploadedFile)) {
-                        ZipEntry entry = zip.getEntry("manifest.webapp");
-                        if (entry == null) {
-                            message = messageSourceService.getMessage("owa.manifest_not_found");
-                            log.warn("Manifest file could not be found in app");
-                            uploadedFile.delete();
-                            session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);                       
-                        } else {
-                            String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
-                                    + request.getServerPort() + request.getContextPath();
-                            appManager.installApp(uploadedFile, fileName, contextPath);
-                            message = messageSourceService.getMessage("owa.app_installed");
-                            session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
-                        }
+            file.transferTo(uploadedFile);            
+            	try (ZipFile zip = new ZipFile(uploadedFile)){                	 
+                    if(zip.size() == 0){
+                    	message = messageSourceService.getMessage("owa.blank_zip");
+                        log.warn("Zip file is empty");       
+                        session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message); 
+                        return "redirect:manage.form";
+                	}
+                    ZipEntry entry = zip.getEntry("manifest.webapp");
+                    if (entry == null) {
+                        message = messageSourceService.getMessage("owa.manifest_not_found");
+                        log.warn("Manifest file could not be found in app");
+                        uploadedFile.delete();
+                        session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
+                    } 
+                    else {
+                        String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
+                                + request.getServerPort() + request.getContextPath();
+                        appManager.installApp(uploadedFile, fileName, contextPath);
+                        message = messageSourceService.getMessage("owa.app_installed");
+                        session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
                     }
                 }
-            }
-            uploadedFile.delete();
-            
-        } else {
-            message = messageSourceService.getMessage("owa.blank_zip");
-            log.warn("Zip file is empty");       
-            session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);    
+            	catch(Exception e)	{
+                    message = messageSourceService.getMessage("owa.not_a_zip");
+            		log.warn("App is not a zip archive");
+                    uploadedFile.delete();
+                    session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
+                    return "redirect:manage.form";
+            	}
         }
-        return "redirect:manage.form";
-    }
+		return "redirect:manage.form";
+	}
 }
