@@ -5,9 +5,16 @@
  */
 package org.openmrs.module.owa.activator;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.ModuleActivator;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * This class contains the logic that is run every time this module is either started or stopped.
@@ -29,6 +36,38 @@ public class OwaActivator implements ModuleActivator {
 	 */
 	@Override
 	public void contextRefreshed() {
+		String owaAppFolderPath = Context.getAdministrationService().getGlobalProperty("owa.appFolderPath");
+		String owaStarted = Context.getAdministrationService().getGlobalProperty("owa.started");
+		String realPath = System.getProperty("user.dir");
+		realPath = realPath.substring(0, realPath.length() - 3);
+		StringBuffer tomcatPath = new StringBuffer(realPath);
+		tomcatPath.append("webapps/openmrs");
+		StringBuffer absPath = new StringBuffer(tomcatPath + "/WEB-INF");
+		absPath.append("/view/module/");
+		System.out.println(absPath.toString().replace("/", File.separator));
+		File dir = new File(absPath.toString().replace("/", File.separator));
+		try {
+			List<File> files = (List<File>) FileUtils.listFiles(dir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+			for (File file : files) {
+				if (file.getCanonicalPath().contains("manifest.webapp") && owaStarted.equalsIgnoreCase("true")) {
+					String owaName = file.getParentFile().getName();
+					String folderPath = file.getCanonicalPath();
+					folderPath = folderPath.substring(0, folderPath.length() - 16);
+					File source = new File(folderPath);
+					String modName = source.getParentFile().getName();
+					File moduleName = new File(owaAppFolderPath.concat("/" + modName));
+					File dest = new File(owaAppFolderPath.concat("/" + modName + "/" + owaName));
+					moduleName.mkdir();
+					dest.mkdir();
+					FileUtils.copyDirectory(source, dest);
+					log.info("Moving file from: " + source + " to " + dest);
+					FileUtils.deleteDirectory(source);
+				}
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 		log.info("OWA Module refreshed");
 	}
 	
