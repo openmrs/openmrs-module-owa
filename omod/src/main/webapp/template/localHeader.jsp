@@ -13,6 +13,12 @@
     </li>
 
     <!-- Add further links here -->
+    <li <c:if test='<%= request.getRequestURI().contains("/settings") %>'>class="active"</c:if>>
+        <a href="${pageContext.request.contextPath}/module/owa/settings.form">
+            <spring:message code="owa.settings" />
+        </a>
+    </li>
+    
 </ul>
 <h2>
     <spring:message code="owa.title" />
