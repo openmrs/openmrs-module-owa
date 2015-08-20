@@ -66,8 +66,9 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
             <div id="uploadArea">
                 <form id="uploadPackageForm" enctype="multipart/form-data" method="post" name="Form" onsubmit="return validateForm()" action="addApp.htm">
                     <span style="margin-right: 30px"><spring:message code="owa.upload_app_package" />:</span>
+                    <br></br>
                     <input type="file" id="file" name="file" accept="application/zip,.zip" />
-                    <input type="submit" value="Upload" style="margin-left: 150px;" />
+                    <input type="submit" value="Upload"/>
                 </form>
             </div>
             <div id="progressbar"></div>
@@ -105,10 +106,10 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
                   <tbody style="cursor:pointer;">
                     <tr>                      
                         <td onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
-                         <img style="max-height:48px;max-width:48px;" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}"></td>            
-                        <td onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top">${app.name} </td>
-                        <td onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top">${app.developer.name}</td>
-                        <td onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top"> ${app.version}</td>              
+                         <img style="height:48px;width:48px;" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}"></td>            
+                        <td width="60%" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top">${app.name} </td>
+                        <td width="20%" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top">${app.developer.name}</td>
+                        <td width="10%" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top"> ${app.version}</td>              
                         <td valign="top"><input type="button" value="Delete" onclick="deleteApp('${app.name}')" type="image"></td>
                     </tr>
                   </tbody>    
