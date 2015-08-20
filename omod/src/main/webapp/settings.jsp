@@ -12,32 +12,28 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
 %>
 
 <style type="text/css">
-.settingRow {
-	padding-top: 1em;
-	clear: both;
-}
-
-.settingName {
-	padding: 0.20em;
-	background-color: #B6B3B2;
-}
-
-.settingValue {
-	float: left;
-	width: 40%;
-}
-
-.settingDescription {
-	font-size: 0.8em;
-	float: left;
-	width: 40%;
-}
-
-.saveButtons {
-	padding-left: 0.5em;
-	background-color: #B6B3B2;
-	clear: both;
-}
+    .settingRow {
+        padding-top: 1em;
+        clear: both;
+    }
+    .settingName {
+        padding: 0.25em;
+        background-color: #‎F0F8FF;
+    }
+    .settingValue {
+        float: left;
+        width: 40%;
+    }
+    .settingDescription {
+        font-size: 0.8em;
+        float: left;
+        width: 55%;
+    }
+    .saveButtons {
+        padding-left: 0.5em;
+        background-color: #‎F0F8FF;
+        clear: both;
+    }
 </style>
 
 <c:if test="${not empty error}">
@@ -56,20 +52,12 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
 	<c:forEach var="globalProp" items="${globalProps}" varStatus="status">
 		<div class="settingRow">
 			<h4 class="settingName">
-				<input name="PROP_NAME" value="${globalProp.property}" readonly="readonly" / >
+				${globalProp.property}
 			</h4>
-			<span class="settingValue"> <c:choose>
-					<c:when test="${fn:length(globalProp.propertyValue) > 20}">
-						<textarea name="PROP_VAL_NAME" rows="4" cols="50" >${globalProp.propertyValue}</textarea>
-					</c:when>
-					<c:otherwise>
-						<input type="text" name="PROP_VAL_NAME"
-							value="${globalProp.propertyValue}" size="30" maxlength="4000" />
-					</c:otherwise>
-				</c:choose>
-			</span> 
-			<span class="settingDescription"> 
-			<textarea name="PROP_DESC_NAME" readonly="readonly" rows="4" cols="100">${globalProp.description}</textarea>
+			<span class="settingValue">
+				<input type="text" size="60" name="PROP_VAL_NAME" value="${globalProp.propertyValue}" size="30" maxlength="4000" />
+			</span>
+			<span class="settingDescription">${globalProp.description}
 			</span>
 		</div>
 	</c:forEach>
