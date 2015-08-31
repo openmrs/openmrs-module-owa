@@ -29,6 +29,11 @@
         <servlet-class>org.openmrs.module.owa.servlet.FileServlet</servlet-class>
     </servlet>
     
+    <servlet>
+        <servlet-name>redirectServlet</servlet-name>
+        <servlet-class>org.openmrs.module.owa.servlet.RedirectServlet</servlet-class>
+    </servlet>
+    
     <filter>
         <filter-name>owaFilter</filter-name>
         <filter-class>org.openmrs.module.owa.filter.OwaFilter</filter-class>

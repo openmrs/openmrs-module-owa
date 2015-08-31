@@ -29,10 +29,9 @@ public class OwaFilter implements Filter {
 	
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+		HttpServletRequest request = (HttpServletRequest) req;
+		String requestURI = request.getRequestURI();
 		if (Context.isAuthenticated()) {
-			HttpServletRequest request = (HttpServletRequest) req;
-			String requestURI = request.getRequestURI();
-			
 			if (requestURI.startsWith(openmrsPath + "/owa")) {
 				String newURI = requestURI.replace("/openmrs/owa", "/ms/owa/fileServlet");
 				req.getRequestDispatcher(newURI).forward(req, res);
@@ -40,7 +39,12 @@ public class OwaFilter implements Filter {
 				chain.doFilter(req, res);
 			}
 		} else {
-			chain.doFilter(req, res);
+			if (requestURI.startsWith(openmrsPath + "/owa")) {
+				String newURI = requestURI.replace("/openmrs/owa", "/ms/owa/redirectServlet");
+				req.getRequestDispatcher(newURI).forward(req, res);
+			} else {
+				chain.doFilter(req, res);
+			}
 		}
 	}
 	
