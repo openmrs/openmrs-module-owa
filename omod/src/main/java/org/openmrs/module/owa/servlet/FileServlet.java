@@ -32,7 +32,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.openmrs.util.OpenmrsUtil;
+import org.openmrs.api.context.Context;
 
 /**
  * A file servlet supporting resume of downloads and client-side caching and GZIP of text content.
@@ -40,6 +40,7 @@ import org.openmrs.util.OpenmrsUtil;
  * servlet can also be used for text files, GZIP would decrease network bandwidth.
  * 
  * @author BalusC
+ * @author Saptarshi Purkayastha (modifications)
  * @link http://balusc.blogspot.com/2009/02/fileservlet-supporting-resume-and.html
  */
 public class FileServlet extends HttpServlet {
@@ -52,12 +53,13 @@ public class FileServlet extends HttpServlet {
 	private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
 	
 	// Properties ---------------------------------------------------------------------------------
-	private final String basePath = OpenmrsUtil.getApplicationDataDirectory() + "owa";
+	private final String basePath = Context.getAdministrationService().getGlobalProperty("owa.appFolderPath");
 	
 	// Actions ------------------------------------------------------------------------------------
 	/**
 	 * Initialize the servlet.
 	 * 
+	 * @throws javax.servlet.ServletException
 	 * @see HttpServlet#init().
 	 */
 	@Override
@@ -82,8 +84,13 @@ public class FileServlet extends HttpServlet {
 	/**
 	 * Process HEAD request. This returns the same headers as GET request, but without content.
 	 * 
+	 * @param request
+	 * @param response
+	 * @throws javax.servlet.ServletException
+	 * @throws java.io.IOException
 	 * @see HttpServlet#doHead(HttpServletRequest, HttpServletResponse).
 	 */
+	@Override
 	protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Process request without content.
 		processRequest(request, response, false);
@@ -92,8 +99,13 @@ public class FileServlet extends HttpServlet {
 	/**
 	 * Process GET request.
 	 * 
+	 * @param request
+	 * @param response
+	 * @throws javax.servlet.ServletException
+	 * @throws java.io.IOException
 	 * @see HttpServlet#doGet(HttpServletRequest, HttpServletResponse).
 	 */
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Process request with content.
 		processRequest(request, response, true);
@@ -177,7 +189,7 @@ public class FileServlet extends HttpServlet {
 		// Validate and process range -------------------------------------------------------------
 		// Prepare some variables. The full Range represents the complete file.
 		Range full = new Range(0, length - 1, length);
-		List<Range> ranges = new ArrayList<Range>();
+		List<Range> ranges = new ArrayList<>();
 		
 		// Validate and process Range and If-Range headers.
 		String range = request.getHeader("Range");
@@ -248,7 +260,7 @@ public class FileServlet extends HttpServlet {
 		
 		// If content type is text, then determine whether GZIP content encoding is supported by
 		// the browser and expand content type with the one and right character encoding.
-		if (contentType.startsWith("text")) {
+		if (contentType.startsWith("text") || contentType.equals("application/javascript")) {
 			String acceptEncoding = request.getHeader("Accept-Encoding");
 			acceptsGzip = acceptEncoding != null && accepts(acceptEncoding, "gzip");
 			contentType += ";charset=UTF-8";
@@ -262,7 +274,7 @@ public class FileServlet extends HttpServlet {
 		// Initialize response.
 		response.reset();
 		response.setBufferSize(DEFAULT_BUFFER_SIZE);
-		response.setHeader("Content-Disposition", disposition + ";filename=\"" + fileName + "\"");
+		//response.setHeader("Content-Disposition", disposition + ";filename=\"" + fileName + "\"");
 		response.setHeader("Accept-Ranges", "bytes");
 		response.setHeader("ETag", eTag);
 		response.setDateHeader("Last-Modified", lastModified);
