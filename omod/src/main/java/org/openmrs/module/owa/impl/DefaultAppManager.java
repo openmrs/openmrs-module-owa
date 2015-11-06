@@ -75,7 +75,7 @@ public class DefaultAppManager implements AppManager {
 	}
 	
 	@Override
-    public void installApp(File file, String fileName, String rootPath) throws IOException {
+        public void installApp(File file, String fileName, String rootPath) throws IOException {
         try (ZipFile zip = new ZipFile(file)) {
             ZipEntry entry = zip.getEntry("manifest.webapp");
 
@@ -203,7 +203,7 @@ public class DefaultAppManager implements AppManager {
 	 * Sets the list of apps with detected apps from the file system.
 	 */
 	@Override
-    public void reloadApps() {
+        public void reloadApps() {
         List<App> appList = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);

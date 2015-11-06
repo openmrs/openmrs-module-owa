@@ -12,6 +12,10 @@ public class RedirectServlet extends HttpServlet {
 	/**
 	 * Process HEAD request. This returns the same headers as GET request, but without content.
 	 * 
+	 * @param request
+	 * @param response
+	 * @throws javax.servlet.ServletException
+	 * @throws java.io.IOException
 	 * @see HttpServlet#doHead(HttpServletRequest, HttpServletResponse).
 	 */
 	@Override
@@ -23,6 +27,10 @@ public class RedirectServlet extends HttpServlet {
 	/**
 	 * Process GET request.
 	 * 
+	 * @param request
+	 * @param response
+	 * @throws javax.servlet.ServletException
+	 * @throws java.io.IOException
 	 * @see HttpServlet#doGet(HttpServletRequest, HttpServletResponse).
 	 */
 	@Override
@@ -42,9 +50,8 @@ public class RedirectServlet extends HttpServlet {
 	private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean content)
 	        throws IOException {
 		String url = request.getRequestURL().toString().replace("/ms/owa/redirectServlet", "/owa");
-                //@TODO redirecting to original url after login in openmrs.
+		//@TODO redirecting to original url after login in openmrs.
 		//System.out.println("inside processRequest ====== " + request.getSession().getAttribute(WebConstants.OPENMRS_LOGIN_REDIRECT_HTTPSESSION_ATTR));
 		response.sendRedirect(request.getContextPath() + "/login.htm?redirect=" + url);
 	}
-	
 }

@@ -36,13 +36,17 @@ public class OwaActivator implements ModuleActivator {
 	 */
 	@Override
 	public void contextRefreshed() {
+		/**
+		 * Used to move the files from omod webapp resources to owa folder when omod webapps contain
+		 * manifest.webapp
+		 */
 		String owaAppFolderPath = Context.getAdministrationService().getGlobalProperty("owa.appFolderPath");
 		String owaStarted = Context.getAdministrationService().getGlobalProperty("owa.started");
 		String realPath = System.getProperty("user.dir");
 		realPath = realPath.substring(0, realPath.length() - 3);
 		StringBuffer tomcatPath = new StringBuffer(realPath);
 		tomcatPath.append("webapps/openmrs");
-		StringBuffer absPath = new StringBuffer(tomcatPath + "/WEB-INF");
+		StringBuilder absPath = new StringBuilder(tomcatPath + "/WEB-INF");
 		absPath.append("/view/module/");
 		System.out.println(absPath.toString().replace("/", File.separator));
 		File dir = new File(absPath.toString().replace("/", File.separator));
