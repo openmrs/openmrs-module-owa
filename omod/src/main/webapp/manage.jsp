@@ -60,7 +60,7 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
             <div id="progressbar"></div>
         </c:when>
         <c:otherwise>
-            <div id="uploadArea">Please configure the <a href="../../admin/maintenance/globalProps.form">app settings</a> before installing apps</div>
+            <div id="uploadArea" class="divTitle">Please configure the <a href="../../module/owa/settings.form">app settings</a> before installing apps</div>
         </c:otherwise>
     </c:choose>
 </div>
@@ -83,7 +83,7 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
 <div class="appList">
     <c:choose>
         <c:when test="${empty appList}">
-            <li style="margin-left: 15px; margin-top: 6px;"><spring:message code="owa.you_have_no_apps_installed" /></li>
+            <span><br/><spring:message code="owa.you_have_no_apps_installed" /></span>
             </c:when>
             <c:otherwise>
             <div class="divTitle">

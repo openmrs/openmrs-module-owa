@@ -20,6 +20,6 @@
     </li>
     
 </ul>
-<h4 style="margin: 0px;">
+<h4>
     <spring:message code="owa.title" />
 </h4>
