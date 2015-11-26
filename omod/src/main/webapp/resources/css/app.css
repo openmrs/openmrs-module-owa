@@ -3,21 +3,17 @@ table {
 }
 
 #content{
-	color: #000;
+    color: #000;
 }
 
 #barcell {
-	padding: 2px;
+    padding: 2px;
 }
 
 #bannerbar {
-	border-spacing: 2px;
-	border-collapse: inherit;
+    border-spacing: 2px;
+    border-collapse: inherit;
 }
-.appList {
-	font-size: 14px;
-}
-
 
 .appList thead th{
     background-color: #1AAC9B;
@@ -28,27 +24,27 @@ table {
 
 .appList table td{
     border: 1px solid #1AAC9B;
-	color: #000;
+    color: #000;
 }
 
 .divTitle{
     border: 1px solid #1AAC9B;
     padding: 10px;
-	width: 100%;
+    width: 100%;
 }
 
 #fileSpan{
-	width: 100%;
+    width: 100%;
 }
 
 #uploadSpan{
-	width: 10%;
-	padding: 2px;
+    width: 10%;
+    padding: 2px;
 }
 
 #clearSpan{
-	width: 10%;
-	padding: 2px;
+    width: 10%;
+    padding: 2px;
 }
 
 
@@ -81,16 +77,16 @@ table {
     width: 55%;
 }
 
-    #progressbar {
-        width: 460px;
-        margin-bottom: 30px;
-    }
+#progressbar {
+    width: 460px;
+    margin-bottom: 30px;
+}
 
-    #appStoreLink {
-        font-size: 15px;
-        color: #777;
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 10px;
-        width: auto;
-        max-width: 460px;
-    }
+#appStoreLink {
+    font-size: 15px;
+    color: #777;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+    width: auto;
+    max-width: 460px;
+}
