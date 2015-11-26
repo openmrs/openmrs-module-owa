@@ -30,18 +30,19 @@ public class SettingsFormController {
 	@RequestMapping(method = RequestMethod.POST)
 	public String handleSubmission(@ModelAttribute("globalPropertiesModel") GlobalPropertiesModel globalPropertiesModel,
 	        Errors errors, WebRequest request) {
-		
-		globalPropertiesModel.validate(globalPropertiesModel, errors);
-		if (errors.hasErrors())
-			return null; // show the form again
-			
-		AdministrationService administrationService = Context.getAdministrationService();
-		for (GlobalProperty p : globalPropertiesModel.getProperties()) {
-			administrationService.saveGlobalProperty(p);
-		}
-		
-		request.setAttribute(WebConstants.OPENMRS_MSG_ATTR, Context.getMessageSourceService().getMessage("general.saved"),
-		    WebRequest.SCOPE_SESSION);
+		if(Context.hasPrivilege("Manage OWA")){
+                        globalPropertiesModel.validate(globalPropertiesModel, errors);
+                        if (errors.hasErrors())
+                                return null; // show the form again
+
+                        AdministrationService administrationService = Context.getAdministrationService();
+                        for (GlobalProperty p : globalPropertiesModel.getProperties()) {
+                                administrationService.saveGlobalProperty(p);
+                        }
+
+                        request.setAttribute(WebConstants.OPENMRS_MSG_ATTR, Context.getMessageSourceService().getMessage("general.saved"),
+                            WebRequest.SCOPE_SESSION);
+                }
 		return "redirect:settings.form";
 	}
 	
@@ -51,11 +52,11 @@ public class SettingsFormController {
 	@ModelAttribute("globalPropertiesModel")
 	public GlobalPropertiesModel getModel() {
 		List<GlobalProperty> editableProps = new ArrayList<>();
-		
-		editableProps.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appBaseUrl"));
-		editableProps.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appFolderPath"));
-		editableProps.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appStoreUrl"));
-		
+		if(Context.hasPrivilege("Manage OWA")){
+                        editableProps.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appBaseUrl"));
+                        editableProps.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appFolderPath"));
+                        editableProps.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appStoreUrl"));
+                }
 		return new GlobalPropertiesModel(editableProps);
 	}
 	

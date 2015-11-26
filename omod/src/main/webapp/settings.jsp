@@ -1,5 +1,5 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
-<openmrs:require privilege="Manage Open Web Apps" otherwise="/login.htm" redirect="/module/owa/settings.form" />
+<openmrs:require privilege="Manage OWA" otherwise="/login.htm" redirect="/module/owa/settings.form" />
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="template/localHeader.jsp"%>
 <openmrs:htmlInclude file="/moduleResources/owa/css/app.css"/>

@@ -7,6 +7,7 @@ package org.openmrs.module.owa.web.controller;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
@@ -38,40 +39,45 @@ public class OwaManageController {
 	@ModelAttribute("appList")
 	@RequestMapping(value = "/manage", method = RequestMethod.GET)
 	public List<App> manage(ModelMap model) {
-		appManager.reloadApps();
-		List<App> appList = appManager.getApps();
+                List<App> appList = new ArrayList<>();
+                if(Context.hasPrivilege("Manage OWA")){
+                        appManager.reloadApps();
+                        appList = appManager.getApps();
+                }
 		return appList;
 	}
 	
 	@RequestMapping(value = "/deleteApp", method = RequestMethod.GET)
 	public String deleteApp(@RequestParam("appName") String appName, ModelMap model) {
-		if (appName != null) {
+		if (appName != null && Context.hasPrivilege("Manage OWA")) {
 			appManager.deleteApp(appName);
+                        model.clear();
 		}
-		model.clear();
 		return "redirect:manage.form";
 	}
 	
 	@RequestMapping(value = "/manager", method = RequestMethod.GET)
 	public String loadSettings(HttpServletRequest request, ModelMap model) {
-		String appFolderPath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_FOLDER_PATH);
-		String appBaseUrl = getAppBaseUrl();
-		String appStoreUrl = getStoreUrl();
-		
-		if (null == appFolderPath) {
-			appManager.setAppFolderPath(OpenmrsUtil.getApplicationDataDirectory() + "owa");
-		}
-		
-		if (null == appBaseUrl) {
-			String contextPath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-			        + request.getContextPath() + "/owa";
-			appManager.setAppBaseUrl(contextPath);
-		}
-		
-		if (null == appStoreUrl) {
-			appManager.setAppStoreUrl("https://modules.openmrs.org");
-		}
-		model.clear();
+                if(Context.hasPrivilege("Manage OWA")){
+                        String appFolderPath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_FOLDER_PATH);
+                        String appBaseUrl = getAppBaseUrl();
+                        String appStoreUrl = getStoreUrl();
+
+                        if (null == appFolderPath) {
+                                appManager.setAppFolderPath(OpenmrsUtil.getApplicationDataDirectory() + "owa");
+                        }
+
+                        if (null == appBaseUrl) {
+                                String contextPath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                                        + request.getContextPath() + "/owa";
+                                appManager.setAppBaseUrl(contextPath);
+                        }
+
+                        if (null == appStoreUrl) {
+                                appManager.setAppStoreUrl("https://modules.openmrs.org");
+                        }
+                        model.clear();
+                }
 		return "redirect:manage.form";
 	}
 	

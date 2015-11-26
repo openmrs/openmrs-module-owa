@@ -79,6 +79,9 @@
         <file>messages_es.properties</file>
     </messages>
     <!-- /Internationalization -->
-
+    <privilege>
+        <name>Manage OWA</name>
+        <description>Allows to configure OWA module, upload modules</description>
+    </privilege>
 </module>
 
