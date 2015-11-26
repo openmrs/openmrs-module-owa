@@ -48,24 +48,15 @@ public class OwaActivator implements ModuleActivator {
 		tomcatPath.append("webapps/openmrs");
 		StringBuilder absPath = new StringBuilder(tomcatPath + "/WEB-INF");
 		absPath.append("/view/module/");
-		System.out.println(absPath.toString().replace("/", File.separator));
 		File dir = new File(absPath.toString().replace("/", File.separator));
 		try {
 			List<File> files = (List<File>) FileUtils.listFiles(dir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
 			for (File file : files) {
 				if (file.getCanonicalPath().contains("manifest.webapp") && owaStarted.equalsIgnoreCase("true")) {
-					String owaName = file.getParentFile().getName();
-					String folderPath = file.getCanonicalPath();
-					folderPath = folderPath.substring(0, folderPath.length() - 16);
-					File source = new File(folderPath);
-					String modName = source.getParentFile().getName();
-					File moduleName = new File(owaAppFolderPath.concat("/" + modName));
-					File dest = new File(owaAppFolderPath.concat("/" + modName + "/" + owaName));
-					moduleName.mkdir();
-					dest.mkdir();
-					FileUtils.copyDirectory(source, dest);
+					File source = file.getParentFile();
+                                        File dest = new File(owaAppFolderPath + File.separator + source.getName());
+					FileUtils.moveDirectory(source, dest);
 					log.info("Moving file from: " + source + " to " + dest);
-					FileUtils.deleteDirectory(source);
 				}
 			}
 		}

@@ -8,7 +8,7 @@
 <spring:hasBindErrors name="globalPropertiesModel">
 	<spring:message code="fix.error"/>
 </spring:hasBindErrors>
-
+<br/>
 <div id="settingsDiv" class="divTitle">
     <h1><span><spring:message code="owa.settings" />:</span></h1>
     <form:form method="post"  modelAttribute="globalPropertiesModel">
