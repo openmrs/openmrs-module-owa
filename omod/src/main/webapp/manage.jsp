@@ -12,63 +12,49 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
 
 <script type="text/javascript">
     function validateForm() {
-    var file=document.forms["Form"]["file"].value;   
-    if (file==null || file=="") {
-      alert("<spring:message code="owa.attach_zip"/>");
-      return false;
-      }
+        var file = document.forms["Form"]["file"].value;
+        if (file == null || file == "") {
+            alert("<spring:message code="owa.attach_zip"/>");
+            return false;
+        }
     }
 </script>
 
-<style type="text/css">
-
-    #uploadArea {
-        border: 1px solid #ccc; 
-        border-radius: 3px; 
-        padding: 10px; 
-        width: 440px; 
-        margin-bottom: 30px;
-    }
-
-    #progressbar {
-        width: 460px;
-        margin-bottom: 30px;
-    }
-
-    #appStoreLink {
-        font-size: 15px;
-        color: #777;
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 10px;
-        width: auto;
-        max-width: 460px;
-    }
-    
-    table{
-        width:100%;
-    }
-    	
-</style>
+<openmrs:htmlInclude file="/moduleResources/owa/css/app.css"/>
+<openmrs:htmlInclude file="/moduleResources/owa/css/bootstrap.min.css"/>
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/jquery-2.1.3.min.js"/>
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/deleteApp.js"/>
+<openmrs:htmlInclude file="/moduleResources/owa/javascript/bootstrap-filestyle.min.js"/>
 
 <c:if test="${not empty error}">
-<div id="openmrs_error"><c:out value="${error}"></c:out></div>
+    <div id="openmrs_error"><c:out value="${error}"></c:out></div>
 </c:if>
 
 <c:if test="${not empty message}">
-<div id="openmrs_msg"><c:out value="${message}"></c:out></div>
+    <div id="openmrs_msg"><c:out value="${message}"></c:out></div>
 </c:if>
 
 <div>
     <c:choose>
         <c:when test="${settingsValid == true}">
-            <div id="uploadArea">
-                <form id="uploadPackageForm" enctype="multipart/form-data" method="post" name="Form" onsubmit="return validateForm()" action="addApp.htm">
-                    <span style="margin-right: 30px"><spring:message code="owa.upload_app_package" />:</span>
-                    <br></br>
-                    <input type="file" id="file" name="file" accept="application/zip,.zip" />
-                    <input type="submit" value="Upload"/>
+            <br/>
+            <div id="uploadArea" class="divTitle">
+                <form name="uploadPackageForm" enctype="multipart/form-data" method="post" name="Form" onsubmit="return validateForm()" action="addApp.htm">
+
+                    <h1><span><spring:message code="owa.upload_app_package" />:</span></h1>
+                    <div class="input-group">
+                        <span class="input-group-btn" id="fileSpan">
+                            <input type="file" id="file" name="file" accept="application/zip,.zip" >
+                        </span>
+                        <span class="input-group-btn" id="uploadSpan">
+                            <button type="submit" class="btn btn-primary btn-file">
+                                <span class="glyphicon glyphicon-upload"></span> Upload
+                            </button>
+                        </span>
+                        <span class="input-group-btn" id="clearSpan">
+                            <button id="clear" class="btn btn-primary btn-file" type="button"> Clear </button>
+                        </span>
+                    </div>
                 </form>
             </div>
             <div id="progressbar"></div>
@@ -79,46 +65,64 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
     </c:choose>
 </div>
 
+<script type="text/javascript">
+    $('#file').filestyle({
+        buttonText: ' Browse ',
+        buttonName: 'btn-primary'
+    });
+
+    $('#clear').click(function () {
+        $('#file').filestyle('clear');
+    });
+</script>
+
 <c:if test="${empty appStoreUrl}">
     <div id="appStoreLink">Look for more apps in the <a href="${appStoreUrl}" target="_blank">app store</a></div>
 </c:if>
 
-<ul class="introList">
+<div class="appList">
     <c:choose>
         <c:when test="${empty appList}">
             <li style="margin-left: 15px; margin-top: 6px;"><spring:message code="owa.you_have_no_apps_installed" /></li>
             </c:when>
             <c:otherwise>
-            <div>
-            <b class="boxHeader">Manage Apps</b>
-                <c:forEach items="${appList}" var="app">
-                <div class="box" id="AppListing">
-                <table>
-                  <thead>
-                    <tr>                     
-                        <th>Logo</th>
-                        <th>Name</th>
-                        <th>Developer</th>
-                        <th>Version</th> 
-                        <th></th>                       
-                    </tr>
-                  </thead>
-                  <tbody style="cursor:pointer;">
-                    <tr>                      
-                        <td onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
-                         <img style="height:48px;width:48px;" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}"></td>            
-                        <td width="60%" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top">${app.name} </td>
-                        <td width="20%" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top">${app.developer.name}</td>
-                        <td width="10%" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top"> ${app.version}</td>              
-                        <td valign="top"><input type="button" value="Delete" onclick="deleteApp('${app.name}')" type="image"></td>
-                    </tr>
-                  </tbody>    
+            <div class="divTitle">
+                <h1><span>Manage Apps:</span></h1>
+                <table width="100%" class="table table-striped table-hover table-condensed">
+                    <thead>
+                        <tr>                     
+                            <th>Logo</th>
+                            <th>Name</th>
+                            <th>Developer</th>
+                            <th>Version</th> 
+                            <th>Delete</th>                       
+                        </tr>
+                    </thead>
+                    <tbody style="cursor:pointer;">
+                        <c:forEach items="${appList}" var="app">
+
+
+                            <tr>                      
+                                <td onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'">
+                                    <img style="height:48px;width:48px;" src="${appBaseUrl}/${app.folderName}/${app.icons.icon48}"></td>            
+                                <td width="65%" align="top"onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top">
+                                    <span style="font-weight: bold">${app.name}</span> </br> ${app.description}
+                                </td>
+                                <td width="20%" valign="top" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top">${app.developer.name}</td>
+                                <td width="5%" valign="top" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top"> ${app.version}</td>              
+                                <td style="text-align: center">
+                                    <button class="btn btn-primary" onclick="deleteApp('${app.name}')">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                    </button>
+                                </td>
+                            </tr>
+
+                        </c:forEach>
+                    </tbody>    
                 </table>
-                </div>
-                </c:forEach>
             </div>
         </c:otherwise>
     </c:choose>
-</ul>
+</div>
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>

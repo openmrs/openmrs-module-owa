@@ -1,0 +1,96 @@
+table {
+    width:100%;
+}
+
+#content{
+	color: #000;
+}
+
+#barcell {
+	padding: 2px;
+}
+
+#bannerbar {
+	border-spacing: 2px;
+	border-collapse: inherit;
+}
+.appList {
+	font-size: 14px;
+}
+
+
+.appList thead th{
+    background-color: #1AAC9B;
+    border: 1px solid #CCC;
+    color: #FFF;
+    padding: 2px;
+}
+
+.appList table td{
+    border: 1px solid #1AAC9B;
+	color: #000;
+}
+
+.divTitle{
+    border: 1px solid #1AAC9B;
+    padding: 10px;
+	width: 100%;
+}
+
+#fileSpan{
+	width: 100%;
+}
+
+#uploadSpan{
+	width: 10%;
+	padding: 2px;
+}
+
+#clearSpan{
+	width: 10%;
+	padding: 2px;
+}
+
+
+.divTitle h1{
+    text-align: left;
+    margin-top: -20px;
+    margin-left: 5px;
+    height: 20px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.divTitle h1 span{
+    background-color: white;
+}
+
+.divTitle h4{
+    background-color: #1AAC9B;
+    padding: 5px;
+}
+
+.settingValue {
+    float: left;
+    width: 40%;
+}
+
+.settingDescription {
+    font-size: 0.8em;
+    float: left;
+    width: 55%;
+}
+
+    #progressbar {
+        width: 460px;
+        margin-bottom: 30px;
+    }
+
+    #appStoreLink {
+        font-size: 15px;
+        color: #777;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 10px;
+        width: auto;
+        max-width: 460px;
+    }
