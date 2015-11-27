@@ -37,10 +37,9 @@ public class AdminList extends AdministrationSectionExt {
 	 */
 	@Override
 	public Map<String, String> getLinks() {
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
 		map.put("/module/owa/manager.form", "owa.manage");
 		map.put("/module/owa/settings.form", "owa.settings");
 		return map;
 	}
-	
 }

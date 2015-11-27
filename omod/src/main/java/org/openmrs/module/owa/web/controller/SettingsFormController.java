@@ -30,19 +30,19 @@ public class SettingsFormController {
 	@RequestMapping(method = RequestMethod.POST)
 	public String handleSubmission(@ModelAttribute("globalPropertiesModel") GlobalPropertiesModel globalPropertiesModel,
 	        Errors errors, WebRequest request) {
-		if(Context.hasPrivilege("Manage OWA")){
-                        globalPropertiesModel.validate(globalPropertiesModel, errors);
-                        if (errors.hasErrors())
-                                return null; // show the form again
-
-                        AdministrationService administrationService = Context.getAdministrationService();
-                        for (GlobalProperty p : globalPropertiesModel.getProperties()) {
-                                administrationService.saveGlobalProperty(p);
-                        }
-
-                        request.setAttribute(WebConstants.OPENMRS_MSG_ATTR, Context.getMessageSourceService().getMessage("general.saved"),
-                            WebRequest.SCOPE_SESSION);
-                }
+		if (Context.hasPrivilege("Manage OWA")) {
+			globalPropertiesModel.validate(globalPropertiesModel, errors);
+			if (errors.hasErrors())
+				return null; // show the form again
+				
+			AdministrationService administrationService = Context.getAdministrationService();
+			for (GlobalProperty p : globalPropertiesModel.getProperties()) {
+				administrationService.saveGlobalProperty(p);
+			}
+			
+			request.setAttribute(WebConstants.OPENMRS_MSG_ATTR, Context.getMessageSourceService()
+			        .getMessage("general.saved"), WebRequest.SCOPE_SESSION);
+		}
 		return "redirect:settings.form";
 	}
 	
@@ -77,6 +77,8 @@ public class SettingsFormController {
 		}
 		
 		/**
+		 * @param clazz
+		 * @return
 		 * @see org.springframework.validation.Validator#supports(java.lang.Class)
 		 */
 		@Override
@@ -85,6 +87,8 @@ public class SettingsFormController {
 		}
 		
 		/**
+		 * @param target
+		 * @param errors
 		 * @see org.springframework.validation.Validator#validate(java.lang.Object,
 		 *      org.springframework.validation.Errors)
 		 */

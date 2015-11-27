@@ -54,14 +54,14 @@ public class OwaActivator implements ModuleActivator {
 			for (File file : files) {
 				if (file.getCanonicalPath().contains("manifest.webapp") && owaStarted.equalsIgnoreCase("true")) {
 					File source = file.getParentFile();
-                                        File dest = new File(owaAppFolderPath + File.separator + source.getName());
+					File dest = new File(owaAppFolderPath + File.separator + source.getName());
 					FileUtils.moveDirectory(source, dest);
 					log.info("Moving file from: " + source + " to " + dest);
 				}
 			}
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 		log.info("OWA Module refreshed");
 	}
