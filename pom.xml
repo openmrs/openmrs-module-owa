@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
     <name>Open Web Apps Module</name>
     <description>Add Open Web Apps to OpenMRS</description>
-    <url>https://wiki.openmrs.org/display/projects/Add+Support+for+Open+Web+Apps</url>
+    <url>https://wiki.openmrs.org/display/docs/Open+Web+Apps+Module</url>
 	
     <developers>
         <developer>
@@ -45,7 +45,6 @@
 
     <dependencyManagement>
         <dependencies>
-			
             <!-- Begin OpenMRS core -->
 			
             <dependency>
