@@ -7,7 +7,7 @@
     <name>${project.parent.name}</name>
     <version>${project.parent.version}</version>
     <package>${project.parent.groupId}.${project.parent.artifactId}</package>
-    <author>Saptarshi P</author>
+    <author>Saptarshi, Namrata, Sandeep</author>
     <description>
         ${project.parent.description}
     </description>
