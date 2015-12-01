@@ -67,9 +67,9 @@ public class OwaRestController {
         public List<GlobalProperty> getSettings() {
             List<GlobalProperty> owaSettings = new ArrayList<>();
             if(Context.hasPrivilege("Manage OWA")){
-                    owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appFolderPath"));
-                    owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appBaseUrl"));
-                    owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appStoreUrl"));
+                    owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_FOLDER_PATH));
+                    owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_BASE_URL));
+                    owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_STORE_URL));
             }
             return owaSettings;
         }

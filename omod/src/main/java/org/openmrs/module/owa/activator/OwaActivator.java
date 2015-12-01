@@ -15,6 +15,7 @@ import org.openmrs.module.ModuleActivator;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import org.openmrs.module.owa.AppManager;
 
 /**
  * This class contains the logic that is run every time this module is either started or stopped.
@@ -40,7 +41,7 @@ public class OwaActivator implements ModuleActivator {
 		 * Used to move the files from omod webapp resources to owa folder when omod webapps contain
 		 * manifest.webapp
 		 */
-		String owaAppFolderPath = Context.getAdministrationService().getGlobalProperty("owa.appFolderPath");
+		String owaAppFolderPath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_FOLDER_PATH);
 		String owaStarted = Context.getAdministrationService().getGlobalProperty("owa.started");
 		String realPath = System.getProperty("user.dir");
 		realPath = realPath.substring(0, realPath.length() - 3);

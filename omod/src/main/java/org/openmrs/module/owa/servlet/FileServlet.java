@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.owa.AppManager;
 
 /**
  * A file servlet supporting resume of downloads and client-side caching and GZIP of text content.
@@ -53,7 +54,7 @@ public class FileServlet extends HttpServlet {
 	private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
 	
 	// Properties ---------------------------------------------------------------------------------
-	private final String basePath = Context.getAdministrationService().getGlobalProperty("owa.appFolderPath");
+	private final String basePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_FOLDER_PATH);
 	
 	// Actions ------------------------------------------------------------------------------------
 	/**
@@ -65,9 +66,7 @@ public class FileServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		// Validate base path.
-		if (this.basePath == null) {
-			throw new ServletException("FileServlet init param 'basePath' is required.");
-		} else {
+		if (this.basePath != null) {
 			File path = new File(this.basePath);
 			if (!path.exists()) {
 				path.mkdir();

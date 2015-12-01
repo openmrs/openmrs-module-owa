@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.owa.AppManager;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -53,9 +54,9 @@ public class SettingsFormController {
 	public GlobalPropertiesModel getModel() {
 		List<GlobalProperty> editableProps = new ArrayList<>();
 		if(Context.hasPrivilege("Manage OWA")){
-                        editableProps.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appBaseUrl"));
-                        editableProps.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appFolderPath"));
-                        editableProps.add(Context.getAdministrationService().getGlobalPropertyObject("owa.appStoreUrl"));
+                        editableProps.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_BASE_URL));
+                        editableProps.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_FOLDER_PATH));
+                        editableProps.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_STORE_URL));
                 }
 		return new GlobalPropertiesModel(editableProps);
 	}

@@ -7,7 +7,7 @@
     </li>
 
     <li <c:if test='<%= request.getRequestURI().contains("/manage") %>'>class="active"</c:if>>
-        <a href="${pageContext.request.contextPath}/module/owa/manage.form">
+        <a href="${pageContext.request.contextPath}/module/owa/manager.form">
             <spring:message code="owa.manage" />
         </a>
     </li>
