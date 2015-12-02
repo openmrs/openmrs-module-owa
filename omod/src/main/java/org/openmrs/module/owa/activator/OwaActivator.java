@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import org.openmrs.module.owa.AppManager;
+import org.openmrs.util.OpenmrsUtil;
 
 /**
  * This class contains the logic that is run every time this module is either started or stopped.
@@ -42,6 +43,10 @@ public class OwaActivator implements ModuleActivator {
 		 * manifest.webapp
 		 */
 		String owaAppFolderPath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_FOLDER_PATH);
+		if (null == owaAppFolderPath) {
+			owaAppFolderPath = OpenmrsUtil.getApplicationDataDirectory() + "owa";
+			Context.getAdministrationService().setGlobalProperty(AppManager.KEY_APP_FOLDER_PATH, owaAppFolderPath);
+		}
 		String owaStarted = Context.getAdministrationService().getGlobalProperty("owa.started");
 		String realPath = System.getProperty("user.dir");
 		realPath = realPath.substring(0, realPath.length() - 3);

@@ -60,7 +60,7 @@
     </globalProperty>
     <globalProperty>
         <property>owa.appStoreUrl</property>
-        <defaultValue>http://appstore.openmrs.org</defaultValue>
+        <defaultValue>http://modules.openmrs.org</defaultValue>
         <description>The default URL for the OpenMRS appstore</description>
     </globalProperty>
 

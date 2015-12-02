@@ -2,6 +2,7 @@ package org.openmrs.module.owa.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -9,6 +10,7 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.owa.AppManager;
+import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -30,7 +32,7 @@ public class SettingsFormController {
 	
 	@RequestMapping(method = RequestMethod.POST)
 	public String handleSubmission(@ModelAttribute("globalPropertiesModel") GlobalPropertiesModel globalPropertiesModel,
-	        Errors errors, WebRequest request) {
+	        Errors errors, WebRequest request, HttpServletRequest req) {
 		if (Context.hasPrivilege("Manage OWA")) {
 			globalPropertiesModel.validate(globalPropertiesModel, errors);
 			if (errors.hasErrors())
@@ -38,6 +40,13 @@ public class SettingsFormController {
 				
 			AdministrationService administrationService = Context.getAdministrationService();
 			for (GlobalProperty p : globalPropertiesModel.getProperties()) {
+				if (p.getProperty().equals(AppManager.KEY_APP_FOLDER_PATH) && p.getPropertyValue().equals("")) {
+					p.setPropertyValue(OpenmrsUtil.getApplicationDataDirectory() + "owa");
+				} else if (p.getProperty().equals(AppManager.KEY_APP_BASE_URL) && p.getPropertyValue().equals("")) {
+					String contextPath = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort()
+					        + request.getContextPath() + "/owa";
+					p.setPropertyValue(contextPath);
+				}
 				administrationService.saveGlobalProperty(p);
 			}
 			
