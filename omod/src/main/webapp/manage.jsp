@@ -25,6 +25,7 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/jquery-2.1.3.min.js"/>
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/deleteApp.js"/>
 <openmrs:htmlInclude file="/moduleResources/owa/javascript/bootstrap-filestyle.min.js"/>
+<openmrs:htmlInclude file="/moduleResources/owa/javascript/jquery.dataTables.min.js"/>
 
 <c:if test="${not empty error}">
     <div id="openmrs_error"><c:out value="${error}"></c:out></div>
@@ -88,12 +89,12 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
             <c:otherwise>
             <div class="divTitle">
                 <h1><span>Manage Apps:</span></h1>
-                <table width="100%" class="table table-striped table-hover table-condensed">
+                <table width="100%" class="table table-striped table-hover table-condensed" id="sort">
                     <thead>
                         <tr>                     
                             <th>Logo</th>
-                            <th>Name</th>
-                            <th>Developer</th>
+                            <th id="sorting">Name</th>
+                            <th id="sorting">Developer</th>
                             <th>Version</th> 
                             <th>Delete</th>                       
                         </tr>
@@ -124,5 +125,12 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
         </c:otherwise>
     </c:choose>
 </div>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#sort').DataTable( {
+        "order": [[ 3, "desc" ]]
+    } );
+} );
+</script>
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>
