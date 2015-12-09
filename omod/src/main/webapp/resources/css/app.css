@@ -110,9 +110,12 @@ table {
   box-sizing: border-box;
   border-style: solid;
 }
-
+#sort_info, #sort_paginate {
+  display: inline-block;
+}
 #sort_paginate{
   text-align: center;
+  float: right;
 }
 #sort_paginate a {
   text-decoration: none;
