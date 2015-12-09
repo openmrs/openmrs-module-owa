@@ -37,6 +37,10 @@ table {
     width: 100%;
 }
 
+#fileSpan .bootstrap-filestyle {
+    width: 100%;
+}
+
 #uploadSpan{
     width: 10%;
     padding: 2px;
@@ -46,7 +50,6 @@ table {
     width: 10%;
     padding: 2px;
 }
-
 
 .divTitle h1{
     text-align: left;
@@ -90,11 +93,11 @@ table {
     width: auto;
     max-width: 460px;
 }
-#sorting {	
-	cursor: pointer;
+#sorting {  
+    cursor: pointer;
 }
-#sorting:hover{	
-	color: #337AB7;
+#sorting:hover{ 
+    color: #337AB7;
 }
 #sort_filter {
   float: right;
