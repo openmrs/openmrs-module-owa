@@ -113,9 +113,12 @@ table {
   box-sizing: border-box;
   border-style: solid;
 }
-
+#sort_info, #sort_paginate {
+  display: inline-block;
+}
 #sort_paginate{
   text-align: center;
+  float: right;
 }
 #sort_paginate a {
   text-decoration: none;
@@ -127,6 +130,13 @@ table {
   margin-right: 3px;
   padding: 1px 5px;
   box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+#sort_paginate .current, #sort_paginate .current:hover {
+  font-weight: bold;
+  background-color: #1AAC9B;
+  cursor: auto;
+  border: 1px #179687;
+  border-style: solid;
 }
 #sort_paginate a:hover {
   text-decoration: none;
