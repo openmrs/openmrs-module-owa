@@ -6,14 +6,18 @@ package org.openmrs.module.owa.web.controller;
  * this file, You can obtain one at http://license.openmrs.org
  */
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.GlobalProperty;
@@ -23,7 +27,6 @@ import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.web.WebConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -52,15 +55,15 @@ public class OwaRestController {
 	// REST implementation
 	// -------------------------------------------------------------------------
 	@RequestMapping(value = "/rest/owa/applist", method = RequestMethod.GET)
-	@ResponseBody
-	public List<App> getAppList() {
-            List<App> appList = new ArrayList<>();
-            if(Context.hasPrivilege("Manage OWA")){
-		appManager.reloadApps();
-		appList = appManager.getApps();
-            }
-            return appList;
-	}
+		@ResponseBody
+		public List<App> getAppList() {
+			List<App> appList = new ArrayList<>();
+	        if(Context.hasPrivilege("Manage OWA")){
+	        	appManager.reloadApps();
+	        	appList = appManager.getApps();
+	        }
+	        return appList;
+		}
 	
 	@RequestMapping(value = "/rest/owa/settings", method = RequestMethod.GET)
         @ResponseBody
@@ -106,20 +109,21 @@ public class OwaRestController {
                             log.warn("Zip file is empty");
                             session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
                             response.sendError(500, message);
-                        }
-                        ZipEntry entry = zip.getEntry("manifest.webapp");
-                        if (entry == null) {
-                            message = messageSourceService.getMessage("owa.manifest_not_found");
-                            log.warn("Manifest file could not be found in app");
-                            uploadedFile.delete();
-                            session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
-                            response.sendError(500, message);
                         } else {
-                            String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
-                                    + request.getServerPort() + request.getContextPath();
-                            appManager.installApp(uploadedFile, fileName, contextPath);
-                            message = messageSourceService.getMessage("owa.app_installed");
-                            session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
+                        	ZipEntry entry = zip.getEntry("manifest.webapp");
+                        	if (entry == null) {
+                        		message = messageSourceService.getMessage("owa.manifest_not_found");
+                        		log.warn("Manifest file could not be found in app");
+                        		uploadedFile.delete();
+                        		session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
+                        		response.sendError(500, message);
+                        	} else {
+                        		String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
+                        				+ request.getServerPort() + request.getContextPath();
+                        		appManager.installApp(uploadedFile, fileName, contextPath);
+                        		message = messageSourceService.getMessage("owa.app_installed");
+                        		session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
+                        	}
                         }
                     } catch (Exception e) {
                         message = messageSourceService.getMessage("owa.not_a_zip");
