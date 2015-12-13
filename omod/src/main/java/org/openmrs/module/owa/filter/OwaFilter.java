@@ -33,14 +33,14 @@ public class OwaFilter implements Filter {
 		String requestURI = request.getRequestURI();
 		if (Context.isAuthenticated()) {
 			if (requestURI.startsWith(openmrsPath + "/owa")) {
-				String newURI = requestURI.replace("/openmrs/owa", "/ms/owa/fileServlet");
+				String newURI = requestURI.replace(openmrsPath + "/owa", "/ms/owa/fileServlet");
 				req.getRequestDispatcher(newURI).forward(req, res);
 			} else {
 				chain.doFilter(req, res);
 			}
 		} else {
 			if (requestURI.startsWith(openmrsPath + "/owa")) {
-				String newURI = requestURI.replace("/openmrs/owa", "/ms/owa/redirectServlet");
+				String newURI = requestURI.replace(openmrsPath + "/owa", "/ms/owa/redirectServlet");
 				req.getRequestDispatcher(newURI).forward(req, res);
 			} else {
 				chain.doFilter(req, res);
