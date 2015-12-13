@@ -1,0 +1,101 @@
+<!doctype html>
+<html ng-app="owaAppManager">
+
+<head>
+    <link href="/moduleResources/owa/css/app.css?v=1.11.2" type="text/css" rel="stylesheet" />
+    <link href="/moduleResources/owa/css/bootstrap.min.css?v=1.11.2" type="text/css" rel="stylesheet" />
+    <script src="/moduleResources/owa/javascript/jquery-2.1.3.min.js?v=1.11.2" type="text/javascript"></script>
+    <script src="/moduleResources/owa/javascript/deleteApp.js?v=1.11.2" type="text/javascript"></script>
+    <script src="/moduleResources/owa/javascript/bootstrap-filestyle.min.js?v=1.11.2" type="text/javascript"></script>
+    <script src="/moduleResources/owa/javascript/jquery.dataTables.min.js"></script>
+
+    <script src="/moduleResources/owa/javascript/angular-1.4.5.min.js"></script>
+    <script src="/moduleResources/owa/javascript/main.js"></script>
+
+    <style>
+        body {
+            margin: 20px;
+        }
+    </style>
+
+    <title>Manage Apps</title>
+</head>
+
+<body>
+
+    <div>
+        <div id="uploadArea" class="divTitle">
+            <form name="uploadPackageForm" enctype="multipart/form-data" method="post" name="Form" ng-controller="AppUploadCtrl" ng-submit="uploadApp()">
+                <h1><span>Upload App package:</span></h1>
+                <div class="input-group">
+                    <span class="input-group-btn" id="fileSpan">
+                        <input type="file" id="file" name="file" accept="application/zip,.zip" file-model="file" required>
+                    </span>
+                    <span class="input-group-btn" id="uploadSpan">
+                        <button type="submit" class="btn btn-primary btn-file">
+                            <span class="glyphicon glyphicon-upload"></span> Upload
+                        </button>
+                    </span>
+                    <span class="input-group-btn" id="clearSpan">
+                        <button id="clear" class="btn btn-primary btn-file" type="button"> Clear </button>
+                    </span>
+                </div>
+            </form>
+        </div>
+        <div id="progressbar"></div>
+    </div>
+
+    <script type="text/javascript">
+    $('#file').filestyle({
+        buttonText: ' Browse ',
+        buttonName: 'btn-primary'
+    });
+    $('#clear').click(function () {
+        $('#file').filestyle('clear');
+    });
+    </script>
+
+    <div class="appList" ng-controller="AppListCtrl">
+        <span ng-if="appList.length == 0"><br/>You have no apps installed.</span>
+        <div class="divTitle" ng-if="appList.length > 0">
+            <h1><span>Manage Apps:</span></h1>
+            <table width="100%" class="table table-striped table-hover table-condensed" id="sort">
+                <thead>
+                    <tr>                     
+                        <th>Logo</th>
+                        <th id="sorting">Name</th>
+                        <th id="sorting">Developer</th>
+                        <th>Version</th> 
+                        <th>Delete</th>                       
+                    </tr>
+                </thead>
+                <tbody style="cursor:pointer;">
+                    <tr ng-repeat="app in appList">                      
+                        <td ng-click="location(app.baseUrl+'/'+app.folderName+'/'+app.launch_path)">
+                            <img style="height:48px;width:48px;" ng-src="{{app.baseUrl}}/{{app.folderName}}/{{app.icons.icon48}}"></td>            
+                        <td width="65%" align="top" ng-click="location(app.baseUrl+'/'+app.folderName+'/'+app.launch_path)" valign="top">
+                            <span style="font-weight: bold">{{app.name}}</span> </br> {{app.description}}
+                        </td>
+                        <td width="20%" valign="top" ng-click="location(app.baseUrl+'/'+app.folderName+'/'+app.launch_path)" valign="top">{{app.developer.name}}</td>
+                        <td width="5%" valign="top" ng-click="location(app.baseUrl+'/'+app.folderName+'/'+app.launch_path)" valign="top">{{app.version}}</td>              
+                        <td style="text-align: center">
+                            <button class="btn btn-primary" ng-click="deleteApp(app.name)">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>    
+            </table>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $('#sort').DataTable({
+            "order": [[ 3, "desc" ]]
+        });
+    });
+    </script>
+</body>
+
+</html>
