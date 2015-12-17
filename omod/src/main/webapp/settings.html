@@ -1,0 +1,57 @@
+<html ng-app="owaSettings">
+
+<head>
+    <link href="/moduleResources/owa/css/app.css?v=1.11.2" type="text/css" rel="stylesheet" />
+    <link href="/moduleResources/owa/css/bootstrap.min.css?v=1.11.2" type="text/css" rel="stylesheet" />
+    <script src="/moduleResources/owa/javascript/jquery-2.1.3.min.js?v=1.11.2" type="text/javascript"></script>
+    <script src="/moduleResources/owa/javascript/deleteApp.js?v=1.11.2" type="text/javascript"></script>
+    <script src="/moduleResources/owa/javascript/bootstrap-filestyle.min.js?v=1.11.2" type="text/javascript"></script>
+    <script src="/moduleResources/owa/javascript/jquery.dataTables.min.js"></script>
+
+    <script src="/moduleResources/owa/javascript/angular-1.4.5.min.js"></script>
+    <script src="/moduleResources/owa/javascript/main.js"></script>
+
+    <style>
+        body {
+            margin: 20px;
+        }
+    </style>
+    <title>Settings</title>
+</head>
+
+<body>
+
+   
+<div id="settingsDiv" class="divTitle" ng-controller="SettingsFormCtrl">
+    <h1><span>Settings:</span></h1>
+    <form id="globalPropertiesModel" ng-submit="save()" method="post">
+        <table width="100%" class="table table-striped table-hover table-condensed">
+            <tbody style="cursor:pointer;">
+                <tr ng-repeat="setting in settingsList">
+                    <td>
+                        <div class="settingRow">
+                            <h4 class="settingName">{{setting.property}}</h4>
+                                <span class="settingValue">
+                                    <input type="text" name="properties[].propertyValue" value="{{setting.propertyValue}}" size="50">
+                                </span>
+                                <span class="settingDescription">
+                                    {{setting.description}}
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+            </tbody>
+        </table>
+        <div class="settingRow">
+            <div class="saveButtons">
+                <input type="submit" value='Save' />
+                <input type="button" value='Cancel'
+                       onclick="javascript:window.location = '/openmrs/admin'" />
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+</body>
