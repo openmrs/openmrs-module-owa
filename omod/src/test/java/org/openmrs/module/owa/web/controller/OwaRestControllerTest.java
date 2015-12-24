@@ -2,9 +2,7 @@ package org.openmrs.module.owa.web.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URL;
 import java.util.List;
-import java.util.zip.ZipInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +16,6 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.messagesource.MessageSourceService;
-import org.openmrs.util.OpenmrsClassLoader;
 import org.openmrs.web.WebConstants;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -98,7 +95,8 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/addapp");
 		HttpServletResponse response = new MockHttpServletResponse();
 		FileInputStream file = new FileInputStream(new File("src/test/resources/Zipwithoutmanifest.zip"));
-		MockMultipartFile mmf = new MockMultipartFile("zipFileNoManifest", "Zipwithoutmanifest.zip", "application/zip,.zip", file);
+		MockMultipartFile mmf = new MockMultipartFile("zipFileNoManifest", "Zipwithoutmanifest.zip", "application/zip,.zip",
+		        file);
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		controller.upload(mmf, request, response);
 		Assert.assertEquals("owa.manifest_not_found", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
