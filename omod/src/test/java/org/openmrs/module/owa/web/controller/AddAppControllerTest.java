@@ -82,8 +82,8 @@ public class AddAppControllerTest extends BaseModuleWebContextSensitiveTest {
 	@Test
 	public void testUploadofZipFilewithProperManifest() throws Exception {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/module/owa/addApp.htm");
-		FileInputStream file = new FileInputStream(new File("src/test/resources/designer.zip"));
-		MockMultipartFile multifile = new MockMultipartFile("testFile", "designer.zip", "application/zip,.zip", file);
+		FileInputStream file = new FileInputStream(new File("src/test/resources/owabasicapp.zip"));
+		MockMultipartFile multifile = new MockMultipartFile("testFile", "owabasicapp.zip", "application/zip,.zip", file);
 		AddAppController controller = (AddAppController) applicationContext.getBean("addAppController");
 		controller.upload(multifile, request);
 		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
