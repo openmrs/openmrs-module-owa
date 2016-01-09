@@ -44,7 +44,7 @@ public class OwaActivator implements ModuleActivator {
 		 */
 		String owaAppFolderPath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_FOLDER_PATH);
 		if (null == owaAppFolderPath) {
-			owaAppFolderPath = OpenmrsUtil.getApplicationDataDirectory() + "owa";
+			owaAppFolderPath = OpenmrsUtil.getApplicationDataDirectory() + "/owa";
 			Context.getAdministrationService().setGlobalProperty(AppManager.KEY_APP_FOLDER_PATH, owaAppFolderPath);
 		}
 		String owaStarted = Context.getAdministrationService().getGlobalProperty("owa.started");
