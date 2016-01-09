@@ -14,11 +14,11 @@ Apps are constructed with HTML, JavaScript and CSS files. Although these can als
     "version": "0.1",
     "name": "My App",
     "description": "My App is a Packaged App",
-    "launch_path": "/index.html",
+    "launch_path": "index.html",
     "icons": {
-        "16": "/img/icons/mortar-16.png",
-        "48": "/img/icons/mortar-48.png",
-        "128": "/img/icons/mortar-128.png"
+        "16": "img/icons/mortar-16.png",
+        "48": "img/icons/mortar-48.png",
+        "128": "img/icons/mortar-128.png"
     },
     "developer": {
         "name": "Me",
@@ -59,3 +59,11 @@ Note that it is only the `manifest.webapp` file which must be placed in the root
 Creating apps in PHP/ASP/Python or another webserver (**hacky/whacky method**)
 --
 The OWA module allows you to configure the location where your apps get installed on the server (`owa.appFolderPath` global property). It also allows you to set the base URL (`owa.appBaseUrl`) where the apps can be accessible from. This means that if you configure your `owa.appFolderPath` to `www` of your Apache2, then it gets deployed onto Apache2 instead of your OpenMRS tomcat or another servlet container. If you can configure a reverse proxy nginx/apache2 nicely, users will assume its a normal app that is actually served from apache/nginx or what server have you.
+
+User guide
+--
+User guide on how to install and configure the module can be found here - [https://wiki.openmrs.org/display/docs/Open+Web+Apps+Module](https://wiki.openmrs.org/display/docs/Open+Web+Apps+Module)
+
+Developer tutorial
+--
+The tutorial to create Open Web Apps can be found here - [https://wiki.openmrs.org/x/_o2QBQ](https://wiki.openmrs.org/x/_o2QBQ)
