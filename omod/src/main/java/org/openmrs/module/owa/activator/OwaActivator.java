@@ -15,6 +15,7 @@ import org.openmrs.module.ModuleActivator;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.util.OpenmrsUtil;
 
@@ -44,7 +45,8 @@ public class OwaActivator implements ModuleActivator {
 		 */
 		String owaAppFolderPath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_FOLDER_PATH);
 		if (null == owaAppFolderPath) {
-			owaAppFolderPath = OpenmrsUtil.getApplicationDataDirectory() + "/owa";
+			owaAppFolderPath = OpenmrsUtil.getApplicationDataDirectory() + (OpenmrsUtil.getApplicationDataDirectory()
+					.endsWith(File.separator) ? "owa" : File.separator + "owa");
 			Context.getAdministrationService().setGlobalProperty(AppManager.KEY_APP_FOLDER_PATH, owaAppFolderPath);
 		}
 		String owaStarted = Context.getAdministrationService().getGlobalProperty("owa.started");

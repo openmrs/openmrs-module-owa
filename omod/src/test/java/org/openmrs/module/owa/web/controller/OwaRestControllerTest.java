@@ -24,47 +24,47 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockServletContext;
 
 public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
-	
+
 	MessageSourceService originalMessageSourceService;
-	
+
 	MessageSourceService messageSourceService;
-	
+
 	public OwaRestControllerTest() {
-		
+
 	}
-	
+
 	@Before
 	public void setUpMockMessageSourceService() {
 		originalMessageSourceService = ServiceContext.getInstance().getMessageSourceService();
 		messageSourceService = Mockito.mock(MessageSourceService.class);
 	}
-	
+
 	@After
 	public void restoreOriginalMessageSourceService() {
 		if (originalMessageSourceService != null) {
 			ServiceContext.getInstance().setMessageSourceService(originalMessageSourceService);
 		}
 	}
-	
+
 	@Test
 	public void getAppList_shouldNotReturnNull() throws Exception {
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		Assert.assertNotNull(controller.getAppList());
 	}
-	
+
 	@Test
 	public void getSettings_shouldNotReturnNull() throws Exception {
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		Assert.assertNotNull(controller.getSettings());
 	}
-	
+
 	@Test
 	public void updateSettings_shouldNotReturnNull() throws Exception {
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		List<GlobalProperty> settings = Context.getAdministrationService().getGlobalProperties();
 		Assert.assertNotNull(controller.updateSettings(settings));
 	}
-	
+
 	/**
 	 * OwaRestController upload method test casing.
 	 */
@@ -72,41 +72,43 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 	public void upload_caseNotAZipFile() throws Exception {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/addapp");
 		HttpServletResponse response = new MockHttpServletResponse();
-		FileInputStream file = new FileInputStream(new File("src/test/resources/testing"));
+		FileInputStream file = new FileInputStream(new File("src/test/resources/testing".replace("/", File.separator)));
 		MockMultipartFile mmf = new MockMultipartFile("nonZipFile", "testing", null, file);
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		controller.upload(mmf, request, response);
 		Assert.assertEquals("owa.not_a_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
-	
+
 	@Test
 	public void upload_caseEmptyZipFile() throws Exception {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/addapp");
 		HttpServletResponse response = new MockHttpServletResponse();
-		FileInputStream file = new FileInputStream(new File("src/test/resources/Blank_Zip.zip"));
+		FileInputStream file = new FileInputStream(
+				new File("src/test/resources/Blank_Zip.zip".replace("/", File.separator)));
 		MockMultipartFile mmf = new MockMultipartFile("emptyZipFile", "Blank_Zip.zip", null, file);
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		controller.upload(mmf, request, response);
 		Assert.assertEquals("owa.blank_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
-	
+
 	@Test
 	public void upload_caseZipFileWithoutManifest() throws Exception {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/addapp");
 		HttpServletResponse response = new MockHttpServletResponse();
-		FileInputStream file = new FileInputStream(new File("src/test/resources/Zipwithoutmanifest.zip"));
+		FileInputStream file = new FileInputStream(new File("src/test/resources/Zipwithoutmanifest.zip".replace("/",
+				File.separator)));
 		MockMultipartFile mmf = new MockMultipartFile("zipFileNoManifest", "Zipwithoutmanifest.zip", "application/zip,.zip",
-		        file);
+				file);
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		controller.upload(mmf, request, response);
 		Assert.assertEquals("owa.manifest_not_found", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
-	
+
 	@Test
 	public void upload_caseProperZipFile() throws Exception {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/addapp");
 		HttpServletResponse response = new MockHttpServletResponse();
-		FileInputStream file = new FileInputStream(new File("src/test/resources/designer.zip"));
+		FileInputStream file = new FileInputStream(new File("src/test/resources/designer.zip".replace("/", File.separator)));
 		MockMultipartFile multifile = new MockMultipartFile("properZipFile", "designer.zip", "application/zip,.zip", file);
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		controller.upload(multifile, request, response);
