@@ -1,6 +1,6 @@
 /**
  * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0 + Health disclaimer. If a copy of the MPL was not 
+ * License, v. 2.0 + Health disclaimer. If a copy of the MPL was not
  * distributed with this file, You can obtain one at http://license.openmrs.org
  */
 package org.openmrs.module.owa.activator;
@@ -15,6 +15,7 @@ import org.openmrs.module.ModuleActivator;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.util.OpenmrsUtil;
 
@@ -22,9 +23,9 @@ import org.openmrs.util.OpenmrsUtil;
  * This class contains the logic that is run every time this module is either started or stopped.
  */
 public class OwaActivator implements ModuleActivator {
-	
+
 	protected Log log = LogFactory.getLog(getClass());
-	
+
 	/**
 	 * @see ModuleActivator#willRefreshContext()
 	 */
@@ -32,7 +33,7 @@ public class OwaActivator implements ModuleActivator {
 	public void willRefreshContext() {
 		log.info("Refreshing OWA Module");
 	}
-	
+
 	/**
 	 * @see ModuleActivator#contextRefreshed()
 	 */
@@ -44,7 +45,8 @@ public class OwaActivator implements ModuleActivator {
 		 */
 		String owaAppFolderPath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_FOLDER_PATH);
 		if (null == owaAppFolderPath) {
-			owaAppFolderPath = OpenmrsUtil.getApplicationDataDirectory() + "/owa";
+			owaAppFolderPath = OpenmrsUtil.getApplicationDataDirectory() + (OpenmrsUtil.getApplicationDataDirectory()
+					.endsWith(File.separator) ? "owa" : File.separator + "owa");
 			Context.getAdministrationService().setGlobalProperty(AppManager.KEY_APP_FOLDER_PATH, owaAppFolderPath);
 		}
 		String owaStarted = Context.getAdministrationService().getGlobalProperty("owa.started");
@@ -71,7 +73,7 @@ public class OwaActivator implements ModuleActivator {
 		}
 		log.info("OWA Module refreshed");
 	}
-	
+
 	/**
 	 * @see ModuleActivator#willStart()
 	 */
@@ -79,7 +81,7 @@ public class OwaActivator implements ModuleActivator {
 	public void willStart() {
 		log.info("Starting OWA Module");
 	}
-	
+
 	/**
 	 * @see ModuleActivator#started()
 	 */
@@ -87,7 +89,7 @@ public class OwaActivator implements ModuleActivator {
 	public void started() {
 		log.info("OWA started");
 	}
-	
+
 	/**
 	 * @see ModuleActivator#willStop()
 	 */
@@ -95,7 +97,7 @@ public class OwaActivator implements ModuleActivator {
 	public void willStop() {
 		log.info("Stopping OWA Module");
 	}
-	
+
 	/**
 	 * @see ModuleActivator#stopped()
 	 */
@@ -103,5 +105,5 @@ public class OwaActivator implements ModuleActivator {
 	public void stopped() {
 		log.info("OWA Module stopped");
 	}
-	
+
 }
