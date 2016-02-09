@@ -14,6 +14,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.owa.AppManager;
 
 /**
  * @author sunbiz
@@ -30,18 +31,21 @@ public class OwaFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
-		String requestURI = request.getRequestURI();
+		String requestURL = request.getRequestURL().toString();
+		
+		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL);
+		
 		if (Context.isAuthenticated()) {
-			if (requestURI.startsWith(openmrsPath + "/owa")) {
-				String newURI = requestURI.replace(openmrsPath + "/owa", "/ms/owa/fileServlet");
-				req.getRequestDispatcher(newURI).forward(req, res);
+			if (requestURL.startsWith(owaBasePath)) {
+				String newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
+				req.getRequestDispatcher(newURL).forward(req, res);
 			} else {
 				chain.doFilter(req, res);
 			}
 		} else {
-			if (requestURI.startsWith(openmrsPath + "/owa")) {
-				String newURI = requestURI.replace(openmrsPath + "/owa", "/ms/owa/redirectServlet");
-				req.getRequestDispatcher(newURI).forward(req, res);
+			if (requestURL.startsWith(owaBasePath)) {
+				String newURL = requestURL.replace(owaBasePath, "/ms/owa/redirectServlet");
+				req.getRequestDispatcher(newURL).forward(req, res);
 			} else {
 				chain.doFilter(req, res);
 			}
