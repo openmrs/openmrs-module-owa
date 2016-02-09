@@ -64,6 +64,10 @@ User guide
 --
 User guide on how to install and configure the module can be found here - [https://wiki.openmrs.org/display/docs/Open+Web+Apps+Module](https://wiki.openmrs.org/display/docs/Open+Web+Apps+Module)
 
-Developer tutorial
+Developer tutorials
 --
-The tutorial to create Open Web Apps can be found here - [https://wiki.openmrs.org/x/_o2QBQ](https://wiki.openmrs.org/x/_o2QBQ)
+Tutorials to create Open Web Apps can be found here:
+- [https://wiki.openmrs.org/x/_o2QBQ](https://wiki.openmrs.org/x/_o2QBQ)
+- https://wiki.openmrs.org/display/docs/Open+Web+App+Development+Workflow
+
+There is a Yeoman generator to automatically scaffold OpenMRS Open Web Apps [here](https://www.npmjs.com/package/generator-openmrs-owa).
