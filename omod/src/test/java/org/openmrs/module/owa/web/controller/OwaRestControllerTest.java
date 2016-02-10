@@ -1,12 +1,5 @@
 package org.openmrs.module.owa.web.controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,12 +9,19 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.messagesource.MessageSourceService;
+import org.openmrs.module.owa.AppManager;
 import org.openmrs.web.WebConstants;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockServletContext;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.List;
 
 public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 
@@ -37,6 +37,8 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 	public void setUpMockMessageSourceService() {
 		originalMessageSourceService = ServiceContext.getInstance().getMessageSourceService();
 		messageSourceService = Mockito.mock(MessageSourceService.class);
+
+		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(AppManager.KEY_APP_FOLDER_PATH, "owa"));
 	}
 
 	@After

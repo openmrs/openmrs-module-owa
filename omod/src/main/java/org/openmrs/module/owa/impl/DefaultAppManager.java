@@ -27,6 +27,17 @@
  */
 package org.openmrs.module.owa.impl;
 
+import org.apache.ant.compress.taskdefs.Unzip;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.openmrs.GlobalProperty;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.owa.App;
+import org.openmrs.module.owa.AppManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,94 +46,82 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.ant.compress.taskdefs.Unzip;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-
-import org.openmrs.GlobalProperty;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.owa.App;
-import org.openmrs.module.owa.AppManager;
-
 /**
  * @author Saptarshi Purkayastha
  */
 public class DefaultAppManager implements AppManager {
-	
+
 	private static final Log log = LogFactory.getLog(DefaultAppManager.class);
-	
+
 	/**
 	 * In-memory singleton list holding state for apps.
 	 */
 	private List<App> apps = new ArrayList();
-	
+
 	private void init() {
 		reloadApps();
 	}
-	
+
 	@Override
 	public List<App> getApps() {
 		String baseUrl = getAppBaseUrl();
-		
+
 		for (App app : apps) {
 			app.setBaseUrl(baseUrl);
 		}
-		
+
 		return apps;
 	}
-	
+
 	@Override
-        public void installApp(File file, String fileName, String rootPath) throws IOException {
-        try (ZipFile zip = new ZipFile(file)) {
-            ZipEntry entry = zip.getEntry("manifest.webapp");
+	public void installApp(File file, String fileName, String rootPath) throws IOException {
+		try (ZipFile zip = new ZipFile(file)) {
+			ZipEntry entry = zip.getEntry("manifest.webapp");
 
-            try (InputStream inputStream = zip.getInputStream(entry)) {
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			try (InputStream inputStream = zip.getInputStream(entry)) {
+				ObjectMapper mapper = new ObjectMapper();
+				mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-                App app = mapper.readValue(inputStream, App.class);
+				App app = mapper.readValue(inputStream, App.class);
 
-                // ---------------------------------------------------------------------
-                // Delete if app is already installed
-                // ---------------------------------------------------------------------
-                String dest = getAppFolderPath() + File.separator + fileName.substring(0, fileName.lastIndexOf('.'));
+				// ---------------------------------------------------------------------
+				// Delete if app is already installed
+				// ---------------------------------------------------------------------
+				String dest = getAppFolderPath() + File.separator + fileName.substring(0, fileName.lastIndexOf('.'));
 
-                if (getApps().contains(app)) {
-                    deleteApp(app.getName());
-                }
+				if (getApps().contains(app)) {
+					deleteApp(app.getName());
+				}
 
-                Unzip unzip = new Unzip();
-                unzip.setSrc(file);
-                unzip.setDest(new File(dest));
-                unzip.execute();
+				Unzip unzip = new Unzip();
+				unzip.setSrc(file);
+				unzip.setDest(new File(dest));
+				unzip.execute();
 
-                // ---------------------------------------------------------------------
-                // Set openmrs server location
-                // ---------------------------------------------------------------------
-                File updateManifest = new File(dest + File.separator + "manifest.webapp");
-                App installedApp = mapper.readValue(updateManifest, App.class);
+				// ---------------------------------------------------------------------
+				// Set openmrs server location
+				// ---------------------------------------------------------------------
+				File updateManifest = new File(dest + File.separator + "manifest.webapp");
+				App installedApp = mapper.readValue(updateManifest, App.class);
 
-                installedApp.setBaseUrl(getAppBaseUrl());
-                installedApp.setFolderName(fileName.substring(0, fileName.lastIndexOf('.')));
+				installedApp.setBaseUrl(getAppBaseUrl());
+				installedApp.setFolderName(fileName.substring(0, fileName.lastIndexOf('.')));
 
-                if (null != installedApp.getActivities() && null != installedApp.getActivities().getOpenmrs()) {
-                    if (null != installedApp.getActivities().getOpenmrs().getHref()) {
-                        if (installedApp.getActivities().getOpenmrs().getHref().equals("*")) {
-                            installedApp.getActivities().getOpenmrs().setHref(rootPath);
-                        }
-                    }
-                }
+				if (null != installedApp.getActivities() && null != installedApp.getActivities().getOpenmrs()) {
+					if (null != installedApp.getActivities().getOpenmrs().getHref()) {
+						if (installedApp.getActivities().getOpenmrs().getHref().equals("*")) {
+							installedApp.getActivities().getOpenmrs().setHref(rootPath);
+						}
+					}
+				}
 
-                mapper.writeValue(updateManifest, installedApp);
-            }
-        }
+				mapper.writeValue(updateManifest, installedApp);
+			}
+		}
 
-        reloadApps(); // Reload app state
-    }
-	
+		reloadApps(); // Reload app state
+	}
+
 	@Override
 	public boolean exists(String appName) {
 		for (App app : getApps()) {
@@ -132,7 +131,7 @@ public class DefaultAppManager implements AppManager {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean deleteApp(String name) {
 		for (App app : getApps()) {
@@ -151,15 +150,22 @@ public class DefaultAppManager implements AppManager {
 				}
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public String getAppFolderPath() {
-		return Context.getAdministrationService().getGlobalProperty(KEY_APP_FOLDER_PATH);
+		String appFolderPath = Context.getAdministrationService().getGlobalProperty(KEY_APP_FOLDER_PATH);
+
+		File folder = new File(appFolderPath);
+		if (!folder.exists()) {
+			setAppFolderPath(appFolderPath); // If the global property is set, make sure the folder exists
+		}
+
+		return appFolderPath;
 	}
-	
+
 	@Override
 	public void setAppFolderPath(String appFolderPath) {
 		if (!appFolderPath.isEmpty()) {
@@ -175,67 +181,69 @@ public class DefaultAppManager implements AppManager {
 		}
 		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(KEY_APP_FOLDER_PATH, appFolderPath));
 	}
-	
+
 	@Override
 	public String getAppBaseUrl() {
 		return Context.getAdministrationService().getGlobalProperty(KEY_APP_BASE_URL);
 	}
-	
+
 	@Override
 	public void setAppBaseUrl(String appBaseUrl) {
 		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(KEY_APP_BASE_URL, appBaseUrl));
 	}
-	
+
 	@Override
 	public String getAppStoreUrl() {
 		return Context.getAdministrationService().getGlobalProperty(KEY_APP_STORE_URL, DEFAULT_APP_STORE_URL);
 	}
-	
+
 	@Override
 	public void setAppStoreUrl(String appStoreUrl) {
 		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(KEY_APP_STORE_URL, appStoreUrl));
 	}
-	
+
 	// -------------------------------------------------------------------------
 	// Supportive methods
 	// -------------------------------------------------------------------------
+
 	/**
 	 * Sets the list of apps with detected apps from the file system.
 	 */
 	@Override
-        public void reloadApps() {
-        List<App> appList = new ArrayList<>();
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	public void reloadApps() {
+		List<App> appList = new ArrayList<>();
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        if (null != getAppFolderPath()) {
-            File appFolderPath = new File(getAppFolderPath());
-            if (appFolderPath.isDirectory()) {
-                File[] listFiles = appFolderPath.listFiles();
-                for (File folder : listFiles) {
-                    if (folder.isDirectory()) {
-                        File appManifest = new File(folder, "manifest.webapp");
-                        if (appManifest.exists()) {
-                            try {
-                                App app = mapper.readValue(appManifest, App.class);
-                                app.setFolderName(folder.getName());
-                                appList.add(app);
-                            } catch (IOException ex) {
-                                log.error("app manifest is non-standard", ex);
-                            }
-                        } else {
-                            log.error("app doesn't have a manifest");
-                        }
-                    }
-                }
-            } else {
-                log.error("appFolder settings is not a directory");
-            }
-        } else {
-            log.error("Incorrect appFolder Path");
-        }
+		if (null != getAppFolderPath()) {
+			File appFolderPath = new File(getAppFolderPath());
+			if (appFolderPath.isDirectory()) {
+				File[] listFiles = appFolderPath.listFiles();
+				for (File folder : listFiles) {
+					if (folder.isDirectory()) {
+						File appManifest = new File(folder, "manifest.webapp");
+						if (appManifest.exists()) {
+							try {
+								App app = mapper.readValue(appManifest, App.class);
+								app.setFolderName(folder.getName());
+								appList.add(app);
+							}
+							catch (IOException ex) {
+								log.error("app manifest is non-standard", ex);
+							}
+						} else {
+							log.error("app doesn't have a manifest");
+						}
+					}
+				}
+			} else {
+				log.error("appFolder settings is not a directory");
+			}
+		} else {
+			log.error("Incorrect appFolder Path");
+		}
 
-        this.apps = appList;
-        log.info("Detected apps: " + apps);
-    }
+		this.apps = appList;
+		log.info("Detected apps: " + apps);
+	}
 }

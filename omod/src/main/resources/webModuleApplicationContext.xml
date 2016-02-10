@@ -23,6 +23,7 @@
     <!-- Add here beans related to the web context -->
 
     <bean id="org.openmrs.module.owa.AppManager" class="org.openmrs.module.owa.impl.DefaultAppManager" />
+    <bean id="org.openmrs.module.owa.activator.OwaActivator" class="org.openmrs.module.owa.activator.OwaActivator" />
     
     <!-- Annotation based controllers -->
     <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>

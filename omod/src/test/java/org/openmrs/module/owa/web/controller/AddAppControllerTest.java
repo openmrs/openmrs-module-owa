@@ -1,24 +1,26 @@
 package org.openmrs.module.owa.web.controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.net.URL;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Test;
 import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mockito;
+import org.openmrs.GlobalProperty;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.messagesource.MessageSourceService;
+import org.openmrs.module.owa.AppManager;
 import org.openmrs.util.OpenmrsClassLoader;
 import org.openmrs.web.WebConstants;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockServletContext;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URL;
 
 /**
  * @author sunbiz
@@ -37,6 +39,8 @@ public class AddAppControllerTest extends BaseModuleWebContextSensitiveTest {
 	public void setUpMockMessageSourceService() {
 		originalMessageSourceService = ServiceContext.getInstance().getMessageSourceService();
 		messageSourceService = Mockito.mock(MessageSourceService.class);
+
+		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(AppManager.KEY_APP_FOLDER_PATH, "owa"));
 	}
 
 	@After
