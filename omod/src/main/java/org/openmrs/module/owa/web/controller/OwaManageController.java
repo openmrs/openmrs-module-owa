@@ -5,11 +5,6 @@
  */
 package org.openmrs.module.owa.web.controller;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
@@ -24,29 +19,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The main controller.
  */
 @Controller
 @RequestMapping("/module/owa")
 public class OwaManageController {
-	
+
 	protected final Log log = LogFactory.getLog(OwaManageController.class);
-	
+
 	@Autowired
 	AppManager appManager;
-	
+
 	@ModelAttribute("appList")
 	@RequestMapping(value = "/manage", method = RequestMethod.GET)
 	public List<App> manage(ModelMap model) {
-                List<App> appList = new ArrayList<>();
-                if(Context.hasPrivilege("Manage OWA")){
-                        appManager.reloadApps();
-                        appList = appManager.getApps();
-                }
+		List<App> appList = new ArrayList<>();
+		if (Context.hasPrivilege("Manage OWA")) {
+			appManager.reloadApps();
+			appList = appManager.getApps();
+		}
 		return appList;
 	}
-	
+
 	@RequestMapping(value = "/deleteApp", method = RequestMethod.GET)
 	public String deleteApp(@RequestParam("appName") String appName, ModelMap model) {
 		if (appName != null && Context.hasPrivilege("Manage OWA")) {
@@ -55,24 +56,27 @@ public class OwaManageController {
 		}
 		return "redirect:manage.form";
 	}
-	
+
 	@RequestMapping(value = "/manager", method = RequestMethod.GET)
 	public String loadSettings(HttpServletRequest request, ModelMap model) {
 		if (Context.hasPrivilege("Manage OWA")) {
-			String appFolderPath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_FOLDER_PATH);
+			String appFolderPath = appManager.getAppFolderPath();
 			String appBaseUrl = getAppBaseUrl();
 			String appStoreUrl = getStoreUrl();
-			
+
 			if (null == appFolderPath) {
-				appManager.setAppFolderPath(OpenmrsUtil.getApplicationDataDirectory() + "owa");
+				String owaAppFolderPath = OpenmrsUtil.getApplicationDataDirectory()
+						+ (OpenmrsUtil.getApplicationDataDirectory().endsWith(File.separator) ? "owa" : File.separator
+						+ "owa");
+				appManager.setAppFolderPath(owaAppFolderPath);
 			}
-			
+
 			if (null == appBaseUrl) {
 				String contextPath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-				        + request.getContextPath() + "/owa";
+						+ request.getContextPath() + "/owa";
 				appManager.setAppBaseUrl(contextPath);
 			}
-			
+
 			if (null == appStoreUrl) {
 				appManager.setAppStoreUrl("https://modules.openmrs.org");
 			}
@@ -80,7 +84,7 @@ public class OwaManageController {
 		}
 		return "redirect:manage.form";
 	}
-	
+
 	@ModelAttribute("settingsValid")
 	public boolean settingsValid() {
 		boolean settingsValid = false;
@@ -93,12 +97,12 @@ public class OwaManageController {
 		}
 		return settingsValid;
 	}
-	
+
 	@ModelAttribute("appBaseUrl")
 	public String getAppBaseUrl() {
 		return Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL);
 	}
-	
+
 	@ModelAttribute("appStoreUrl")
 	public String getStoreUrl() {
 		return Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_STORE_URL);
