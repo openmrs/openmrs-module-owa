@@ -4,7 +4,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>owa</artifactId>
-    <version>1.3</version>
+    <version>1.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Open Web Apps Module</name>
     <description>Add Open Web Apps to OpenMRS</description>
@@ -31,7 +31,7 @@
         <connection>scm:git:git@github.com:openmrs/openmrs-module-owa.git</connection>
         <developerConnection>scm:git:git@github.com:openmrs/openmrs-module-owa.git</developerConnection>
         <url>https://github.com/openmrs/openmrs-module-owa.git</url>
-        <tag>1.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <modules>
