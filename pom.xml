@@ -28,9 +28,9 @@
     </organization>
 
     <scm>
-        <connection>scm:git:git@github.com:sunbiz/openmrs-modules-owa.git</connection>
-        <developerConnection>scm:git:git@github.com:sunbiz/openmrs-modules-owa.git</developerConnection>
-        <url>https://github.com/sunbiz/openmrs-modules-owa.git</url>
+        <connection>scm:git:git@github.com:openmrs/openmrs-module-owa.git</connection>
+        <developerConnection>scm:git:git@github.com:openmrs/openmrs-module-owa.git</developerConnection>
+        <url>https://github.com/openmrs/openmrs-module-owa.git</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -183,5 +183,18 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
+    
+    <distributionManagement>
+    	<repository>
+    		<id>openmrs-repo-modules</id>
+    		<name>OpenMRS Nexus Modules</name>
+    		<url>http://mavenrepo.openmrs.org/nexus/content/repositories/modules</url>
+    	</repository>
+    	<snapshotRepository>
+    		<id>openmrs-repo-snapshots</id>
+    		<name>OpenMRS Nexus Snapshots</name>
+    		<url>http://mavenrepo.openmrs.org/nexus/content/repositories/snapshots</url>
+    	</snapshotRepository>
+    </distributionManagement>
 
 </project>
