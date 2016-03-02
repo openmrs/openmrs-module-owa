@@ -6,6 +6,9 @@
 package org.openmrs.module.owa.filter;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -13,6 +16,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.owa.AppManager;
 
@@ -33,7 +38,7 @@ public class OwaFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		String requestURL = request.getRequestURL().toString();
 		
-		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL);
+		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL, "http://localhost:8080/openmrs/owa");
 		
 		if (Context.isAuthenticated()) {
 			if (requestURL.startsWith(owaBasePath)) {

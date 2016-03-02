@@ -59,7 +59,7 @@ public class OwaActivator implements ModuleActivator, ServletContextAware {
 
 		String owaStarted = Context.getAdministrationService().getGlobalProperty("owa.started");
 		String openmrsRootPath = servletContext.getRealPath("/");
-		String absPath = openmrsRootPath + "WEB-INF" + File.separator + "view" + File.separator + "module";
+		String absPath = new File(openmrsRootPath, "WEB-INF" + File.separator + "view" + File.separator + "module").getAbsolutePath();
 
 		File dir = new File(absPath);
 		try {
