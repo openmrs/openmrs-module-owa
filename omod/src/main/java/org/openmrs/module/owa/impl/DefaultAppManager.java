@@ -37,6 +37,8 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
+import org.openmrs.module.owa.OwaListener;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,12 +48,12 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-/**
- * @author Saptarshi Purkayastha
- */
 public class DefaultAppManager implements AppManager {
 
 	private static final Log log = LogFactory.getLog(DefaultAppManager.class);
+
+	@Autowired(required = false)
+	private List<OwaListener> owaListeners;
 
 	/**
 	 * In-memory singleton list holding state for apps.
@@ -61,7 +63,11 @@ public class DefaultAppManager implements AppManager {
 	private void init() {
 		reloadApps();
 	}
-
+	
+	public void setOwaListeners(List<OwaListener> owaListeners) {
+		this.owaListeners = owaListeners;
+	}
+	
 	@Override
 	public List<App> getApps() {
 		String baseUrl = getAppBaseUrl();
@@ -116,6 +122,15 @@ public class DefaultAppManager implements AppManager {
 				}
 
 				mapper.writeValue(updateManifest, installedApp);
+				if (owaListeners != null) {
+					for (OwaListener listener : owaListeners) {
+						try {
+							listener.installedApp(app);
+						} catch (Exception ex) {
+							log.error("installedApp listener " + listener + " failed", ex);
+						}
+					}
+				}
 			}
 		}
 
@@ -139,6 +154,16 @@ public class DefaultAppManager implements AppManager {
 				try {
 					String folderPath = getAppFolderPath() + File.separator + app.getFolderName();
 					FileUtils.forceDelete(new File(folderPath));
+					if (owaListeners != null) {
+						for (OwaListener listener : owaListeners) {
+							try {
+								listener.deletedApp(app);
+							}
+							catch (Exception ex) {
+								log.error("deleteApp listener " + listener + " failed", ex);
+							}
+						}
+					}
 					return true;
 				}
 				catch (IOException ex) {
@@ -245,5 +270,14 @@ public class DefaultAppManager implements AppManager {
 
 		this.apps = appList;
 		log.info("Detected apps: " + apps);
+		if (owaListeners != null) {
+			for (OwaListener listener : owaListeners) {
+				try {
+					listener.appsReloaded(appList);
+				} catch (Exception ex) {
+					log.error("appsReloaded listener " + listener + " failed", ex);
+				}
+			}
+		}
 	}
 }
