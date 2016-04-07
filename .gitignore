@@ -15,3 +15,8 @@ hs_err_pid*
 
 # IntelliJ
 .idea
+*.iml
+
+# created while running tests
+omod/owa
+omod/*.zip
