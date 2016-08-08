@@ -11,7 +11,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.owa.AppActivities;
 import org.openmrs.module.owa.AppManager;
+import org.openmrs.module.owa.impl.DefaultAppManager;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.web.context.ServletContextAware;
 
@@ -76,6 +78,30 @@ public class OwaActivator implements ModuleActivator, ServletContextAware {
 		catch (IOException e) {
 			log.error(e);
 		}
+
+		/**
+		 * Check if there is any '.zip' file in OWA app directory and deploy them
+		 * this app manager is out of Spring context, so apps have to be reloaded here
+		 */
+		AppManager appManager = new DefaultAppManager();
+		appManager.reloadApps();
+		File owaDir = new File(Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_FOLDER_PATH));
+		File[] files = owaDir.listFiles();
+		if (files != null) {
+			for (File file : files) {
+				if (file.getName().endsWith(".zip")) {
+					try {
+						log.info("Deploying OWA from: "+file.getName()+"...");
+						appManager.installApp(file, file.getName(), Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL));
+						file.delete();
+					}
+					catch (IOException e) {
+						log.error("Failed to deploy OWA from zip file: "+file.getName(), e);
+					}
+				}
+			}
+		}
+
 		log.info("OWA Module refreshed");
 	}
 
