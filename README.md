@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/openmrs/openmrs-module-owa.svg?branch=master)](https://travis-ci.org/openmrs/openmrs-module-owa)
+
 OpenMRS Open Web Apps module
 ============================
 A packaged app is an [Open Web App] (https://developer.mozilla.org/en-US/docs/Open_Web_apps_and_Web_standards) that has all of its resources (HTML, CSS, JavaScript, app manifest, and so on) contained in a zip file. This module allows uploading Open Web Apps (OWA) to OpenMRS using the user-interface at runtime. A packaged app is a ZIP file with an [app manifest] (http://www.w3.org/2008/webapps/manifest/) in its root directory. The manifest must be named `manifest.webapp`. The [Mozilla page on apps] (https://developer.mozilla.org/en-US/Apps/Quickstart) provides a detailed description.
