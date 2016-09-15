@@ -72,8 +72,10 @@ public class OwaManageController {
 			}
 
 			if (null == appBaseUrl) {
-				String contextPath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-						+ request.getContextPath() + "/owa";
+				String requestUrl = request.getRequestURL().toString().replace(request.getScheme() + "://", "");
+				//get everything between :// and context path, eg if path is 'http://localhost:8080/openmrs/...' it will get 'localhost:8080'
+				String serverPath = requestUrl.substring(0, requestUrl.indexOf(request.getContextPath()));
+				String contextPath = request.getScheme() + "://" + serverPath + request.getContextPath() + "/owa";
 				appManager.setAppBaseUrl(contextPath);
 			}
 
