@@ -60,8 +60,10 @@ Note that it is only the `manifest.webapp` file which must be placed in the root
 
 Creating apps in PHP/ASP/Python or another webserver (**hacky/whacky method**)
 --
-The OWA module allows you to configure the location where your apps get installed on the server (`owa.appFolderPath` global property). It also allows you to set the base URL (`owa.appBaseUrl`) where the apps can be accessible from. This means that if you configure your `owa.appFolderPath` to `www` of your Apache2, then it gets deployed onto Apache2 instead of your OpenMRS tomcat or another servlet container. If you can configure a reverse proxy nginx/apache2 nicely, users will assume its a normal app that is actually served from apache/nginx or what server have you.
+The OWA module allows you to configure the location where your apps get installed on the server (`owa.appFolderPath` global property). This means that if you configure your `owa.appFolderPath` to `www` of your Apache2, then it gets deployed onto Apache2 instead of your OpenMRS tomcat or another servlet container. If you can configure a reverse proxy nginx/apache2 nicely, users will assume its a normal app that is actually served from apache/nginx or what server have you.
 
+You also are able to set the base URL (`owa.appBaseUrl`) where the apps can be accessible from. base URL can be either full request URL (e.g. `http://localhost:8080/openmrs/owa`) or relative to OpenMRS context path (e.g. `/owa`).
+ 
 User guide
 --
 User guide on how to install and configure the module can be found here - [https://wiki.openmrs.org/display/docs/Open+Web+Apps+Module](https://wiki.openmrs.org/display/docs/Open+Web+Apps+Module)
