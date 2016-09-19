@@ -45,10 +45,6 @@ public class SettingsFormController {
 					p.setPropertyValue(OpenmrsUtil.getApplicationDataDirectory()
 							+ (OpenmrsUtil.getApplicationDataDirectory().endsWith(File.separator) ? "owa" : File.separator
 							+ "owa"));
-				} else if (p.getProperty().equals(AppManager.KEY_APP_BASE_URL) && p.getPropertyValue().equals("")) {
-					String contextPath = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort()
-							+ request.getContextPath() + "/owa";
-					p.setPropertyValue(contextPath);
 				}
 				administrationService.saveGlobalProperty(p);
 			}
