@@ -37,6 +37,8 @@ public class OwaFilterTest extends BaseModuleWebContextSensitiveTest {
 
 	private static String SOME_PATH_IN_APP = "/anything/index.hml";
 
+	private static String DEFAULT_APP_BASE_SERVLET_PATH = "/owa"+SOME_PATH_IN_APP;
+
 	private static String DUMMY_CONTEXT_PATH = "http://localhost:80/openmrs";
 
 	private static String FILE_SERVLET_REDIRECT_URL = "/ms/owa/fileServlet";
@@ -71,10 +73,9 @@ public class OwaFilterTest extends BaseModuleWebContextSensitiveTest {
 		MockHttpServletResponse rsp = new MockHttpServletResponse();
 
 		// First make sure that it works with the default base URL
-		Context.getAdministrationService().saveGlobalProperty(
-				new GlobalProperty(AppManager.KEY_APP_BASE_URL, DEFAULT_APP_BASE_URL));
-
 		MockHttpServletRequest req = new MockHttpServletRequest("GET", DEFAULT_APP_BASE_URI + SOME_PATH_IN_APP);
+		//have to explicitly set servlet path because constructor doesn't do that
+		req.setServletPath(DEFAULT_APP_BASE_SERVLET_PATH);
 		owaFilter.doFilter(req, rsp, mockFilterChain);
 		Assert.assertEquals(rsp.getStatus(), 200);
 		Assert.assertEquals(FILE_SERVLET_REDIRECT_URL + SOME_PATH_IN_APP, rsp.getForwardedUrl());

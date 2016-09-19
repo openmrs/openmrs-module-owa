@@ -5,9 +5,8 @@
  */
 package org.openmrs.module.owa.filter;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.owa.AppManager;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -16,30 +15,35 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.owa.AppManager;
+import java.io.IOException;
 
 /**
  * @author sunbiz
  */
 public class OwaFilter implements Filter {
-	
+
+	public static final String DEFAULT_BASE_URL = "/owa";
+
 	private String openmrsPath;
-	
+
 	@Override
 	public void init(FilterConfig fc) throws ServletException {
 		openmrsPath = fc.getServletContext().getContextPath();
 	}
-	
+
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
-		String requestURL = request.getRequestURL().toString();
-		
-		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL, "http://localhost:8080/openmrs/owa");
-		
+		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL,
+				DEFAULT_BASE_URL);
+
+		String requestURL = null;
+		if (isFullBasePath(owaBasePath)) {
+			requestURL = request.getRequestURL().toString();
+		} else {
+			requestURL = request.getServletPath();
+		}
+
 		if (Context.isAuthenticated()) {
 			if (requestURL.startsWith(owaBasePath)) {
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
@@ -56,7 +60,12 @@ public class OwaFilter implements Filter {
 			}
 		}
 	}
-	
+
+	//owaBasePath can be either full path (must contain protocol) or relative servlet path
+	public static boolean isFullBasePath(String owaBasePath) {
+		return owaBasePath.contains("://");
+	}
+
 	@Override
 	public void destroy() {
 	}

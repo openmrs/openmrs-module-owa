@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
+import org.openmrs.module.owa.filter.OwaFilter;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -61,7 +62,6 @@ public class OwaManageController {
 	public String loadSettings(HttpServletRequest request, ModelMap model) {
 		if (Context.hasPrivilege("Manage OWA")) {
 			String appFolderPath = appManager.getAppFolderPath();
-			String appBaseUrl = getAppBaseUrl();
 			String appStoreUrl = getStoreUrl();
 
 			if (null == appFolderPath) {
@@ -71,17 +71,10 @@ public class OwaManageController {
 				appManager.setAppFolderPath(owaAppFolderPath);
 			}
 
-			if (null == appBaseUrl) {
-				String requestUrl = request.getRequestURL().toString().replace(request.getScheme() + "://", "");
-				//get everything between :// and context path, eg if path is 'http://localhost:8080/openmrs/...' it will get 'localhost:8080'
-				String serverPath = requestUrl.substring(0, requestUrl.indexOf(request.getContextPath()));
-				String contextPath = request.getScheme() + "://" + serverPath + request.getContextPath() + "/owa";
-				appManager.setAppBaseUrl(contextPath);
-			}
-
 			if (null == appStoreUrl) {
 				appManager.setAppStoreUrl("https://modules.openmrs.org");
 			}
+
 			model.clear();
 		}
 		return "redirect:manage.form";
@@ -102,7 +95,12 @@ public class OwaManageController {
 
 	@ModelAttribute("appBaseUrl")
 	public String getAppBaseUrl() {
-		return Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL);
+		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL, OwaFilter.DEFAULT_BASE_URL);
+		if(OwaFilter.isFullBasePath(owaBasePath)){
+			return owaBasePath;
+		} else {
+			return "/openmrs"+owaBasePath;
+		}
 	}
 
 	@ModelAttribute("appStoreUrl")
