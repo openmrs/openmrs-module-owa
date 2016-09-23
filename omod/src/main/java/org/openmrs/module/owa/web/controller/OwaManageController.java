@@ -32,12 +32,12 @@ import java.util.List;
 @Controller
 @RequestMapping("/module/owa")
 public class OwaManageController {
-
+	
 	protected final Log log = LogFactory.getLog(OwaManageController.class);
-
+	
 	@Autowired
 	AppManager appManager;
-
+	
 	@ModelAttribute("appList")
 	@RequestMapping(value = "/manage", method = RequestMethod.GET)
 	public List<App> manage(ModelMap model) {
@@ -48,7 +48,7 @@ public class OwaManageController {
 		}
 		return appList;
 	}
-
+	
 	@RequestMapping(value = "/deleteApp", method = RequestMethod.GET)
 	public String deleteApp(@RequestParam("appName") String appName, ModelMap model) {
 		if (appName != null && Context.hasPrivilege("Manage OWA")) {
@@ -57,29 +57,29 @@ public class OwaManageController {
 		}
 		return "redirect:manage.form";
 	}
-
+	
 	@RequestMapping(value = "/manager", method = RequestMethod.GET)
 	public String loadSettings(HttpServletRequest request, ModelMap model) {
 		if (Context.hasPrivilege("Manage OWA")) {
 			String appFolderPath = appManager.getAppFolderPath();
 			String appStoreUrl = getStoreUrl();
-
+			
 			if (null == appFolderPath) {
 				String owaAppFolderPath = OpenmrsUtil.getApplicationDataDirectory()
-						+ (OpenmrsUtil.getApplicationDataDirectory().endsWith(File.separator) ? "owa" : File.separator
-						+ "owa");
+				        + (OpenmrsUtil.getApplicationDataDirectory().endsWith(File.separator) ? "owa" : File.separator
+				                + "owa");
 				appManager.setAppFolderPath(owaAppFolderPath);
 			}
-
+			
 			if (null == appStoreUrl) {
 				appManager.setAppStoreUrl("https://modules.openmrs.org");
 			}
-
+			
 			model.clear();
 		}
 		return "redirect:manage.form";
 	}
-
+	
 	@ModelAttribute("settingsValid")
 	public boolean settingsValid() {
 		boolean settingsValid = false;
@@ -92,17 +92,18 @@ public class OwaManageController {
 		}
 		return settingsValid;
 	}
-
+	
 	@ModelAttribute("appBaseUrl")
 	public String getAppBaseUrl() {
-		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL, OwaFilter.DEFAULT_BASE_URL);
-		if(OwaFilter.isFullBasePath(owaBasePath)){
+		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL,
+		    OwaFilter.DEFAULT_BASE_URL);
+		if (OwaFilter.isFullBasePath(owaBasePath)) {
 			return owaBasePath;
 		} else {
-			return "/openmrs"+owaBasePath;
+			return "/openmrs" + owaBasePath;
 		}
 	}
-
+	
 	@ModelAttribute("appStoreUrl")
 	public String getStoreUrl() {
 		return Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_STORE_URL);

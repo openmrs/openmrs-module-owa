@@ -21,29 +21,29 @@ import java.io.IOException;
  * @author sunbiz
  */
 public class OwaFilter implements Filter {
-
+	
 	public static final String DEFAULT_BASE_URL = "/owa";
-
+	
 	private String openmrsPath;
-
+	
 	@Override
 	public void init(FilterConfig fc) throws ServletException {
 		openmrsPath = fc.getServletContext().getContextPath();
 	}
-
+	
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
 		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL,
-				DEFAULT_BASE_URL);
-
+		    DEFAULT_BASE_URL);
+		
 		String requestURL = null;
 		if (isFullBasePath(owaBasePath)) {
 			requestURL = request.getRequestURL().toString();
 		} else {
 			requestURL = request.getServletPath();
 		}
-
+		
 		if (Context.isAuthenticated()) {
 			if (requestURL.startsWith(owaBasePath)) {
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
@@ -60,12 +60,12 @@ public class OwaFilter implements Filter {
 			}
 		}
 	}
-
+	
 	//owaBasePath can be either full path (must contain protocol) or relative servlet path
 	public static boolean isFullBasePath(String owaBasePath) {
 		return owaBasePath.contains("://");
 	}
-
+	
 	@Override
 	public void destroy() {
 	}

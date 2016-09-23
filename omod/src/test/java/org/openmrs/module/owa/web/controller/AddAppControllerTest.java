@@ -26,30 +26,30 @@ import java.net.URL;
  * @author sunbiz
  */
 public class AddAppControllerTest extends BaseModuleWebContextSensitiveTest {
-
+	
 	MessageSourceService originalMessageSourceService;
-
+	
 	MessageSourceService messageSourceService;
-
+	
 	public AddAppControllerTest() {
-
+		
 	}
-
+	
 	@Before
 	public void setUpMockMessageSourceService() {
 		originalMessageSourceService = ServiceContext.getInstance().getMessageSourceService();
 		messageSourceService = Mockito.mock(MessageSourceService.class);
-
+		
 		Context.getAdministrationService().saveGlobalProperty(new GlobalProperty(AppManager.KEY_APP_FOLDER_PATH, "owa"));
 	}
-
+	
 	@After
 	public void restoreOriginalMessageSourceService() {
 		if (originalMessageSourceService != null) {
 			ServiceContext.getInstance().setMessageSourceService(originalMessageSourceService);
 		}
 	}
-
+	
 	/**
 	 * Test of upload method, of class AddAppController.
 	 */
@@ -62,30 +62,29 @@ public class AddAppControllerTest extends BaseModuleWebContextSensitiveTest {
 		controller.upload(multifile, request);
 		Assert.assertEquals("owa.not_a_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
-
+	
 	@Test
 	public void testUploadofEmptyZipFile() throws Exception {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/module/owa/addApp.htm");
-		FileInputStream file = new FileInputStream(
-				new File("src/test/resources/Blank_Zip.zip".replace("/", File.separator)));
+		FileInputStream file = new FileInputStream(new File("src/test/resources/Blank_Zip.zip".replace("/", File.separator)));
 		MockMultipartFile multifile = new MockMultipartFile("testFile", "Blank_Zip.zip", null, file);
 		AddAppController controller = (AddAppController) applicationContext.getBean("addAppController");
 		controller.upload(multifile, request);
 		Assert.assertEquals("owa.blank_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
-
+	
 	@Test
 	public void testUploadofZipFilewithoutManifest() throws Exception {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/module/owa/addApp.htm");
 		FileInputStream file = new FileInputStream(new File("src/test/resources/Zipwithoutmanifest.zip".replace("/",
-				File.separator)));
+		    File.separator)));
 		MockMultipartFile multifile = new MockMultipartFile("testFile", "Zipwithoutmanifest.zip", "application/zip,.zip",
-				file);
+		        file);
 		AddAppController controller = (AddAppController) applicationContext.getBean("addAppController");
 		controller.upload(multifile, request);
 		Assert.assertEquals("owa.manifest_not_found", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
-
+	
 	@Test
 	public void testUploadofZipFilewithProperManifest() throws Exception {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/module/owa/addApp.htm");
@@ -95,5 +94,5 @@ public class AddAppControllerTest extends BaseModuleWebContextSensitiveTest {
 		controller.upload(multifile, request);
 		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
 	}
-
+	
 }

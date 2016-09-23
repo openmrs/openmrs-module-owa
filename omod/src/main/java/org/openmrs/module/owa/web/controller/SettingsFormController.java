@@ -24,41 +24,39 @@ import java.util.List;
 @Controller
 @RequestMapping("/module/owa/settings")
 public class SettingsFormController {
-
+	
 	private static final Log log = LogFactory.getLog(SettingsFormController.class);
-
+	
 	@RequestMapping(method = RequestMethod.GET)
 	public void showForm() {
 	}
-
+	
 	@RequestMapping(method = RequestMethod.POST)
 	public String handleSubmission(@ModelAttribute("globalPropertiesModel") GlobalPropertiesModel globalPropertiesModel,
-			Errors errors, WebRequest request, HttpServletRequest req) {
+	        Errors errors, WebRequest request, HttpServletRequest req) {
 		if (Context.hasPrivilege("Manage OWA")) {
 			globalPropertiesModel.validate(globalPropertiesModel, errors);
 			if (errors.hasErrors())
 				return null; // show the form again
-
+				
 			AdministrationService administrationService = Context.getAdministrationService();
 			for (GlobalProperty p : globalPropertiesModel.getProperties()) {
 				if (p.getProperty().equals(AppManager.KEY_APP_FOLDER_PATH) && p.getPropertyValue().equals("")) {
 					p.setPropertyValue(OpenmrsUtil.getApplicationDataDirectory()
-							+ (OpenmrsUtil.getApplicationDataDirectory().endsWith(File.separator) ? "owa" : File.separator
-							+ "owa"));
+					        + (OpenmrsUtil.getApplicationDataDirectory().endsWith(File.separator) ? "owa" : File.separator
+					                + "owa"));
 				} else if (p.getProperty().equals(AppManager.KEY_APP_BASE_URL) && p.getPropertyValue().equals("")) {
-					String contextPath = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort()
-							+ request.getContextPath() + "/owa";
-					p.setPropertyValue(contextPath);
+					p.setPropertyValue("/owa");
 				}
 				administrationService.saveGlobalProperty(p);
 			}
-
+			
 			request.setAttribute(WebConstants.OPENMRS_MSG_ATTR, Context.getMessageSourceService()
-					.getMessage("general.saved"), WebRequest.SCOPE_SESSION);
+			        .getMessage("general.saved"), WebRequest.SCOPE_SESSION);
 		}
 		return "redirect:settings.form";
 	}
-
+	
 	/**
 	 * @return
 	 */
@@ -72,23 +70,23 @@ public class SettingsFormController {
 		}
 		return new GlobalPropertiesModel(editableProps);
 	}
-
+	
 	/**
 	 * Represents the model object for the form, which is typically used as a wrapper for the list
 	 * of global properties list so that spring can bind the properties of the objects in the list.
 	 * Also capable of validating itself
 	 */
 	public class GlobalPropertiesModel implements Validator {
-
+		
 		private List<GlobalProperty> properties;
-
+		
 		public GlobalPropertiesModel() {
 		}
-
+		
 		public GlobalPropertiesModel(List<GlobalProperty> properties) {
 			this.properties = properties;
 		}
-
+		
 		/**
 		 * @param clazz
 		 * @return
@@ -98,20 +96,20 @@ public class SettingsFormController {
 		public boolean supports(Class<?> clazz) {
 			return clazz.equals(getClass());
 		}
-
+		
 		/**
 		 * @param target
 		 * @param errors
 		 * @see org.springframework.validation.Validator#validate(java.lang.Object,
-		 * org.springframework.validation.Errors)
+		 *      org.springframework.validation.Errors)
 		 */
 		@Override
 		public void validate(Object target, Errors errors) {
 		}
-
+		
 		/**
 		 * Returns the global property for the given propertyName
-		 *
+		 * 
 		 * @param propertyName
 		 * @return
 		 */
@@ -125,14 +123,14 @@ public class SettingsFormController {
 			}
 			return prop;
 		}
-
+		
 		/**
 		 * @return
 		 */
 		public List<GlobalProperty> getProperties() {
 			return properties;
 		}
-
+		
 		/**
 		 * @param properties
 		 */
