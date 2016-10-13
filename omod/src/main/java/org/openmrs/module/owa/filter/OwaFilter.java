@@ -5,6 +5,7 @@
  */
 package org.openmrs.module.owa.filter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.owa.AppManager;
 
@@ -36,6 +37,10 @@ public class OwaFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL,
 		    DEFAULT_BASE_URL);
+		
+		if (StringUtils.isBlank(owaBasePath)) {
+			owaBasePath = DEFAULT_BASE_URL;
+		}
 		
 		String requestURL = null;
 		if (isFullBasePath(owaBasePath)) {
