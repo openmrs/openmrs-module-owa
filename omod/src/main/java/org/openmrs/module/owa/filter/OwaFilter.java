@@ -5,7 +5,8 @@
  */
 package org.openmrs.module.owa.filter;
 
-import java.io.IOException;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.owa.AppManager;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -14,10 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang3.StringUtils;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.owa.AppManager;
+import java.io.IOException;
 
 /**
  * @author sunbiz
@@ -38,11 +36,6 @@ public class OwaFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL,
 		    DEFAULT_BASE_URL);
-		
-		if (StringUtils.isBlank(owaBasePath)) {
-			System.out.println("yyyyyyyyyyyyyyyyy=" + owaBasePath);
-			owaBasePath = DEFAULT_BASE_URL;
-		}
 		
 		System.out.println("kkkkkkkkkkkkkkkkkkkk="+owaBasePath);
 		String requestURL = null;
