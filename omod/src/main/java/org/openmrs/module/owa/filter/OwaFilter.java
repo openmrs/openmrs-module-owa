@@ -37,6 +37,7 @@ public class OwaFilter implements Filter {
 		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL,
 		    DEFAULT_BASE_URL);
 		
+		System.out.println("kkkkkkkkkkkkkkkkkkkk="+owaBasePath);
 		String requestURL = null;
 		if (isFullBasePath(owaBasePath)) {
 			requestURL = request.getRequestURL().toString();
@@ -44,18 +45,27 @@ public class OwaFilter implements Filter {
 			requestURL = request.getServletPath();
 		}
 		
+		System.out.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb="+requestURL);
 		if (Context.isAuthenticated()) {
+			System.out.println("ccccccccccccccccc="+requestURL);
 			if (requestURL.startsWith(owaBasePath)) {
+				System.out.println("ddddddddddddddddddd="+requestURL);
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
+				System.out.println("ooooooooooooooooooooooooooo="+newURL);
 				req.getRequestDispatcher(newURL).forward(req, res);
 			} else {
+				System.out.println("eeeeeeeeeeeeeeeeeeeeeeeeee="+requestURL);
 				chain.doFilter(req, res);
 			}
 		} else {
+			System.out.println("fffffffffffffffffffffffffffffffffffffff="+requestURL);
 			if (requestURL.startsWith(owaBasePath)) {
+				System.out.println("ggggggggggggggggggggggggggggggggggg="+requestURL);
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/redirectServlet");
+				System.out.println("pppppppppppppppppppppppp="+newURL);
 				req.getRequestDispatcher(newURL).forward(req, res);
 			} else {
+				System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh="+requestURL);
 				chain.doFilter(req, res);
 			}
 		}

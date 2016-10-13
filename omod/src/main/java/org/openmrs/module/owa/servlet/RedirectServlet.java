@@ -49,7 +49,8 @@ public class RedirectServlet extends HttpServlet {
 	 */
 	private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean content)
 	        throws IOException {
-		String url = request.getRequestURL().toString().replace("/ms/owa/redirectServlet", "/owa");
+		String url = request.getRequestURL().toString(); //.replace("/ms/owa/redirectServlet", "/owa");
+		System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa="+url);
 		//@TODO redirecting to original url after login in openmrs.
 		response.sendRedirect(request.getContextPath() + "/login.htm?redirect=" + url);
 	}
