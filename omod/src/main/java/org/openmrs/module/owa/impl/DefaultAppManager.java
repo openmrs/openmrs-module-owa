@@ -29,6 +29,7 @@ package org.openmrs.module.owa.impl;
 
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.DeserializationConfig;
@@ -92,12 +93,20 @@ public class DefaultAppManager implements AppManager {
 
 				// ---------------------------------------------------------------------
 				// Delete if app is already installed
+				// If app specified 'deployed.owa.name', use it instead of default name based on package name
 				// ---------------------------------------------------------------------
-				String dest = getAppFolderPath() + File.separator + fileName.substring(0, fileName.lastIndexOf('.'));
 
-				if (getApps().contains(app)) {
+				String deployedName = fileName.substring(0, fileName.lastIndexOf('.'));
+
+				if(StringUtils.isNotBlank(app.getDeployedName())){
+					deployedName = app.getDeployedName();
+					//delete app deployed in the same directory
+					deleteApp(app.getDeployedName());
+				} else {
 					deleteApp(app.getName());
 				}
+
+				String dest = getAppFolderPath() + File.separator + deployedName;
 
 				Unzip unzip = new Unzip();
 				unzip.setSrc(file);
@@ -111,7 +120,7 @@ public class DefaultAppManager implements AppManager {
 				App installedApp = mapper.readValue(updateManifest, App.class);
 
 				installedApp.setBaseUrl(getAppBaseUrl());
-				installedApp.setFolderName(fileName.substring(0, fileName.lastIndexOf('.')));
+				installedApp.setFolderName(deployedName);
 
 				if (null != installedApp.getActivities() && null != installedApp.getActivities().getOpenmrs()) {
 					if (null != installedApp.getActivities().getOpenmrs().getHref()) {
