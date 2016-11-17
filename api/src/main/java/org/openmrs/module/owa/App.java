@@ -83,6 +83,9 @@ public class App implements Serializable {
 	@JsonProperty
 	private String baseUrl;
 	
+	@JsonProperty("deployed.owa.name")
+	private String deployedName;
+	
 	// -------------------------------------------------------------------------
 	// Logic
 	// -------------------------------------------------------------------------
@@ -189,6 +192,14 @@ public class App implements Serializable {
 	
 	public void setBaseUrl(String baseUrl) {
 		this.baseUrl = baseUrl;
+	}
+	
+	public String getDeployedName() {
+		return deployedName;
+	}
+	
+	public void setDeployedName(String deployedName) {
+		this.deployedName = deployedName;
 	}
 	
 	// -------------------------------------------------------------------------
