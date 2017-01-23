@@ -36,9 +36,9 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
 </c:if>
 
 <div>
+    <br/>
     <c:choose>
-        <c:when test="${settingsValid == true}">
-            <br/>
+        <c:when test="${allowAdmin}">
             <div id="uploadArea" class="divTitle">
                 <form name="uploadPackageForm" enctype="multipart/form-data" method="post" name="Form" onsubmit="return validateForm()" action="addApp.htm">
 
@@ -60,9 +60,9 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
             </div>
             <div id="progressbar"></div>
         </c:when>
-        <c:otherwise>
+        <c:when test="${!settingsValid}">
             <div id="uploadArea" class="divTitle">Please configure the <a href="../../module/owa/settings.form">app settings</a> before installing apps</div>
-        </c:otherwise>
+        </c:when>
     </c:choose>
 </div>
 
@@ -112,9 +112,18 @@ session.removeAttribute(WebConstants.OPENMRS_ERROR_ATTR);
                                 <td width="20%" valign="top" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top">${app.developer.name}</td>
                                 <td width="5%" valign="top" onclick="location.href = '${appBaseUrl}/${app.folderName}/${app.launchPath}'" valign="top"> ${app.version}</td>              
                                 <td style="text-align: center">
-                                    <button class="btn btn-primary" onclick="deleteApp('${app.name}')">
-                                        <span class="glyphicon glyphicon-remove"></span>
-                                    </button>
+                                    <c:choose>
+                                        <c:when test="${allowAdmin}">
+                                            <button class="btn btn-primary" onclick="deleteApp('${app.name}')">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button class="btn btn-primary disabled" title="<spring:message code="owa.settings_not_allowed"/>">
+                                                <span class="glyphicon glyphicon-lock"></span>
+                                            </button>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
                             </tr>
 

@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.ModuleUtil;
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
@@ -55,6 +56,11 @@ public class SettingsFormController {
 			        .getMessage("general.saved"), WebRequest.SCOPE_SESSION);
 		}
 		return "redirect:settings.form";
+	}
+
+	@ModelAttribute("allowAdmin")
+	public boolean isAllowAdmin() {
+		return ModuleUtil.allowAdmin();
 	}
 	
 	/**
