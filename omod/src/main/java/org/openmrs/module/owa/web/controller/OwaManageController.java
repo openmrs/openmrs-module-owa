@@ -8,6 +8,7 @@ package org.openmrs.module.owa.web.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.ModuleUtil;
 import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.module.owa.filter.OwaFilter;
@@ -102,6 +103,11 @@ public class OwaManageController {
 		} else {
 			return "/openmrs" + owaBasePath;
 		}
+	}
+
+	@ModelAttribute("allowAdmin")
+	public boolean isAllowAdmin() {
+		return ModuleUtil.allowAdmin();
 	}
 	
 	@ModelAttribute("appStoreUrl")
