@@ -104,7 +104,7 @@ public class OwaManageController {
 			return "/openmrs" + owaBasePath;
 		}
 	}
-
+	
 	@ModelAttribute("allowAdmin")
 	public boolean isAllowAdmin() {
 		return ModuleUtil.allowAdmin();
