@@ -93,21 +93,23 @@ public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 		assertThat(destinationDirectory, exists());
 		assertThat(new File(destinationDirectory, "manifest.webapp"), exists());
 	}
-
+	
 	@Test
 	public void shouldOverwriteAppWithSameDeployedName() throws Exception {
 		File destinationDirectory = new File("owa/uicommons-customized");
 		//given
-		File refappCustomizedApp = new File("src/test/resources/refapp-uicommons-customized.zip".replace("/", File.separator));
+		File refappCustomizedApp = new File(
+		        "src/test/resources/refapp-uicommons-customized.zip".replace("/", File.separator));
 		appManager.installApp(refappCustomizedApp, "refapp-uicommons-customized.zip", "http://localhost:8080");
 		// file 'otherdistro.marker' is used to determine whether refapp-uicommons-customized app
 		// had been replaced with otherdistro-uicommons-customized app
 		assertThat(new File(destinationDirectory, "otherdistro.marker"), not(exists()));
-		File otherCustomizedApp = new File("src/test/resources/otherdistro-uicommons-customized.zip".replace("/", File.separator));
-
+		File otherCustomizedApp = new File("src/test/resources/otherdistro-uicommons-customized.zip".replace("/",
+		    File.separator));
+		
 		//when other app with deployed name 'uicommons-customized'
 		appManager.installApp(otherCustomizedApp, "otherdistro-uicommons-customized.zip", "http://localhost:8080");
-
+		
 		//then check if marker file has been deployed
 		assertThat(new File(destinationDirectory, "otherdistro.marker"), exists());
 	}
@@ -120,20 +122,21 @@ public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 		}
 		return null;
 	}
-
-	private Matcher<File> exists(){
+	
+	private Matcher<File> exists() {
 		return new BaseMatcher<File>() {
+			
 			@Override
 			public boolean matches(Object item) {
 				final File file = (File) item;
 				return file.exists();
 			}
-
+			
 			@Override
 			public void describeTo(Description description) {
 				description.appendText("file should exist");
 			}
-
+			
 			@Override
 			public void describeMismatch(Object item, Description description) {
 				description.appendText("file does not exist");

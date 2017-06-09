@@ -57,7 +57,7 @@ public class SettingsFormController {
 		}
 		return "redirect:settings.form";
 	}
-
+	
 	@ModelAttribute("allowAdmin")
 	public boolean isAllowAdmin() {
 		return ModuleUtil.allowAdmin();
