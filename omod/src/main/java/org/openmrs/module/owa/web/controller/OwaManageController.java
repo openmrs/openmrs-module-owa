@@ -95,13 +95,14 @@ public class OwaManageController {
 	}
 	
 	@ModelAttribute("appBaseUrl")
-	public String getAppBaseUrl() {
+	public String getAppBaseUrl(HttpServletRequest request) {
+		String serverContext = request.getContextPath();
 		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL,
 		    OwaFilter.DEFAULT_BASE_URL);
 		if (OwaFilter.isFullBasePath(owaBasePath)) {
 			return owaBasePath;
 		} else {
-			return "/openmrs" + owaBasePath;
+			return serverContext + owaBasePath;
 		}
 	}
 
