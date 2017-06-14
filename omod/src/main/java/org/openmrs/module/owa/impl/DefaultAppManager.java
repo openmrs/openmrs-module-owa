@@ -27,7 +27,7 @@
  */
 package org.openmrs.module.owa.impl;
 
-import org.apache.ant.compress.taskdefs.Unzip;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.GlobalProperty;
+import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
@@ -108,10 +109,12 @@ public class DefaultAppManager implements AppManager {
 
 				String dest = getAppFolderPath() + File.separator + deployedName;
 
-				Unzip unzip = new Unzip();
-				unzip.setSrc(file);
-				unzip.setDest(new File(dest));
-				unzip.execute();
+				try {
+					net.lingala.zip4j.core.ZipFile zipFile = new net.lingala.zip4j.core.ZipFile(file);
+					zipFile.extractAll(dest);
+				} catch (ZipException e) {
+					throw new APIException(e.getMessage(), e);
+				}
 
 				// ---------------------------------------------------------------------
 				// Set openmrs server location
