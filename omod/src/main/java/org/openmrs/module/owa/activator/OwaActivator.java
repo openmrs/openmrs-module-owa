@@ -111,7 +111,7 @@ public class OwaActivator implements ModuleActivator, ServletContextAware {
 						    Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL));
 						file.delete();
 					}
-					catch (IOException e) {
+					catch (Exception e) {
 						log.error("Failed to deploy OWA from zip file: " + file.getName(), e);
 					}
 				}
