@@ -27,9 +27,7 @@
  */
 package org.openmrs.module.owa.impl;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipFile;
-import org.apache.commons.compress.utils.IOUtils;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -45,14 +43,12 @@ import org.openmrs.module.owa.OwaListener;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class DefaultAppManager implements AppManager {
 	
@@ -88,7 +84,7 @@ public class DefaultAppManager implements AppManager {
 	@Override
 	public void installApp(File file, String fileName, String rootPath) throws IOException {
 		try (ZipFile zip = new ZipFile(file)) {
-			ZipArchiveEntry entry = zip.getEntry("manifest.webapp");
+			ZipEntry entry = zip.getEntry("manifest.webapp");
 
 			try (InputStream inputStream = zip.getInputStream(entry)) {
 				ObjectMapper mapper = new ObjectMapper();
@@ -113,7 +109,12 @@ public class DefaultAppManager implements AppManager {
 
 				String dest = getAppFolderPath() + File.separator + deployedName;
 
-				unzip(zip, dest);
+				try {
+					net.lingala.zip4j.core.ZipFile zipFile = new net.lingala.zip4j.core.ZipFile(file);
+					zipFile.extractAll(dest);
+				} catch (ZipException e) {
+					throw new APIException(e.getMessage(), e);
+				}
 
 				// ---------------------------------------------------------------------
 				// Set openmrs server location
@@ -143,29 +144,11 @@ public class DefaultAppManager implements AppManager {
 					}
 				}
 			}
-
-			reloadApps(); // Reload app state
 		}
-	}
 
-	private void unzip(ZipFile zip, String dest) throws IOException {
-		Enumeration<? extends ZipArchiveEntry> entries = zip.getEntries();
-		while (entries.hasMoreElements()) {
-			ZipArchiveEntry entry = entries.nextElement();
-			File entryDestination = new File(dest, entry.getName());
-			if (entry.isDirectory()) {
-				entryDestination.mkdirs();
-			} else {
-				entryDestination.getParentFile().mkdirs();
-				InputStream in = zip.getInputStream(entry);
-				OutputStream out = new FileOutputStream(dest);
-				IOUtils.copy(in, out);
-				IOUtils.closeQuietly(in);
-				out.close();
-			}
-		}
+		reloadApps(); // Reload app state
 	}
-
+	
 	@Override
 	public boolean exists(String appName) {
 		for (App app : getApps()) {

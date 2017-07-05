@@ -103,9 +103,9 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-compress</artifactId>
-                <version>1.14</version>
+                <groupId>net.lingala.zip4j</groupId>
+                <artifactId>zip4j</artifactId>
+                <version>1.3.2</version>
             </dependency>
 
         </dependencies>
