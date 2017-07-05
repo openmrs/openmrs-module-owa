@@ -78,12 +78,14 @@ public class OwaActivator implements ModuleActivator, ServletContextAware {
 			List<File> files = (List<File>) FileUtils.listFiles(dir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
 			for (File file : files) {
 				if (file.getName().endsWith(".owa")) {
-					FileUtils.moveFile(file, new File(owaAppFolder, file.getName()));
+					File dest = new File(owaAppFolder, file.getName());
+					FileUtils.copyFile(file, dest);
+					log.info("Copying owa file from: " + file + " to " + dest);
 				} else if (file.getCanonicalPath().contains("manifest.webapp")) {
 					File source = file.getParentFile();
 					File dest = new File(owaAppFolder, source.getName());
-					FileUtils.moveDirectory(source, dest);
-					log.info("Moving file from: " + source + " to " + dest);
+					FileUtils.copyDirectory(source, dest);
+					log.info("Copying owa dir from: " + source + " to " + dest);
 				}
 			}
 		}
