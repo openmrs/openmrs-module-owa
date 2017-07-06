@@ -85,79 +85,79 @@ public class DefaultAppManager implements AppManager {
 	
 	@Override
 	public void installApp(File file, String fileName, String rootPath) throws IOException {
+		App app;
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
 		try (ZipFile zip = new ZipFile(file)) {
 			ZipArchiveEntry entry = zip.getEntry("manifest.webapp");
-
 			try (InputStream inputStream = zip.getInputStream(entry)) {
-				ObjectMapper mapper = new ObjectMapper();
-				mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+				String manifest = org.apache.commons.io.IOUtils.toString(inputStream);
+				app = mapper.readValue(manifest, App.class);
+			}
+		}
 
-				App app = mapper.readValue(inputStream, App.class);
+		// ---------------------------------------------------------------------
+		// Delete if app is already installed
+		// If app specified 'deployed.owa.name', use it instead of default name based on package name
+		// ---------------------------------------------------------------------
+		String deployedName = fileName.substring(0, fileName.lastIndexOf('.'));
+		if(StringUtils.isNotBlank(app.getDeployedName())){
+			deployedName = app.getDeployedName();
+			//delete app deployed in the same directory
+			deleteApp(app.getDeployedName());
+		} else {
+			deleteApp(app.getName());
+		}
 
-				// ---------------------------------------------------------------------
-				// Delete if app is already installed
-				// If app specified 'deployed.owa.name', use it instead of default name based on package name
-				// ---------------------------------------------------------------------
+		String dest = getAppFolderPath() + File.separator + deployedName;
+		unzip(file, dest);
 
-				String deployedName = fileName.substring(0, fileName.lastIndexOf('.'));
+		// ---------------------------------------------------------------------
+		// Set openmrs server location
+		// ---------------------------------------------------------------------
+		File updateManifest = new File(dest + File.separator + "manifest.webapp");
 
-				if(StringUtils.isNotBlank(app.getDeployedName())){
-					deployedName = app.getDeployedName();
-					//delete app deployed in the same directory
-					deleteApp(app.getDeployedName());
-				} else {
-					deleteApp(app.getName());
-				}
+		app.setBaseUrl(getAppBaseUrl());
+		app.setFolderName(deployedName);
 
-				String dest = getAppFolderPath() + File.separator + deployedName;
-				unzip(zip, dest);
-
-				// ---------------------------------------------------------------------
-				// Set openmrs server location
-				// ---------------------------------------------------------------------
-				File updateManifest = new File(dest + File.separator + "manifest.webapp");
-				App installedApp = mapper.readValue(updateManifest, App.class);
-
-				installedApp.setBaseUrl(getAppBaseUrl());
-				installedApp.setFolderName(deployedName);
-
-				if (null != installedApp.getActivities() && null != installedApp.getActivities().getOpenmrs()) {
-					if (null != installedApp.getActivities().getOpenmrs().getHref()) {
-						if (installedApp.getActivities().getOpenmrs().getHref().equals("*")) {
-							installedApp.getActivities().getOpenmrs().setHref(rootPath);
-						}
-					}
-				}
-
-				mapper.writeValue(updateManifest, installedApp);
-				if (owaListeners != null) {
-					for (OwaListener listener : owaListeners) {
-						try {
-							listener.installedApp(app);
-						} catch (Exception ex) {
-							log.error("installedApp listener " + listener + " failed", ex);
-						}
-					}
+		if (null != app.getActivities() && null != app.getActivities().getOpenmrs()) {
+			if (null != app.getActivities().getOpenmrs().getHref()) {
+				if (app.getActivities().getOpenmrs().getHref().equals("*")) {
+					app.getActivities().getOpenmrs().setHref(rootPath);
 				}
 			}
-
-			reloadApps(); // Reload app state
 		}
+
+		mapper.writeValue(updateManifest, app);
+
+		if (owaListeners != null) {
+			for (OwaListener listener : owaListeners) {
+				try {
+					listener.installedApp(app);
+				} catch (Exception ex) {
+					log.error("installedApp listener " + listener + " failed", ex);
+				}
+			}
+		}
+
+		reloadApps(); // Reload app state
 	}
 	
-	private void unzip(ZipFile zip, String dest) throws IOException {
-		Enumeration<? extends ZipArchiveEntry> entries = zip.getEntries();
-		while (entries.hasMoreElements()) {
-			ZipArchiveEntry entry = entries.nextElement();
-			File entryDestination = new File(dest, entry.getName());
-			if (entry.isDirectory()) {
-				entryDestination.mkdirs();
-			} else {
-				if (!entryDestination.getParentFile().exists()) {
-					entryDestination.getParentFile().mkdirs();
-				}
-				try (InputStream in = zip.getInputStream(entry)) {
-					try (OutputStream out = new FileOutputStream(entryDestination)) {
+	private void unzip(File file, String dest) throws IOException {
+		try (ZipFile zip = new ZipFile(file)) {
+			Enumeration<? extends ZipArchiveEntry> entries = zip.getEntries();
+			while (entries.hasMoreElements()) {
+				ZipArchiveEntry entry = entries.nextElement();
+				File entryDestination = new File(dest, entry.getName());
+				if (entry.isDirectory()) {
+					entryDestination.mkdirs();
+				} else {
+					if (!entryDestination.getParentFile().exists()) {
+						entryDestination.getParentFile().mkdirs();
+					}
+					try (InputStream in = zip.getInputStream(entry);
+						OutputStream out = new FileOutputStream(entryDestination)) {
 						IOUtils.copy(in, out);
 					}
 				}
