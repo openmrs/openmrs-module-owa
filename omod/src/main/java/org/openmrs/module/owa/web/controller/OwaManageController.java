@@ -105,7 +105,7 @@ public class OwaManageController {
 			return serverContext + owaBasePath;
 		}
 	}
-
+	
 	@ModelAttribute("allowAdmin")
 	public boolean isAllowAdmin() {
 		return ModuleUtil.allowAdmin();

@@ -1,26 +1,9 @@
 package org.openmrs.module.owa.impl;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.isNotNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-import java.io.File;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-
-import org.apache.commons.io.FileUtils;
 import org.hamcrest.BaseMatcher;
-import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
-import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -35,6 +18,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.util.ReflectionUtils;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.nio.file.Files;
+import java.util.Arrays;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 	
 	DefaultAppManager appManager;
@@ -46,26 +44,32 @@ public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 	@Mock
 	OwaListener listener;
 	
+	File owaDir;
+	
 	@Before
 	public void setUp() throws Exception {
 		initMocks(this);
 		appManager = new DefaultAppManager();
 		appManager.setOwaListeners(Arrays.asList(listener));
-		administrationService.saveGlobalProperty(new GlobalProperty(AppManager.KEY_APP_FOLDER_PATH, "owa"));
+		owaDir = Files.createTempDirectory("owa").toFile();
+		administrationService.saveGlobalProperty(new GlobalProperty(AppManager.KEY_APP_FOLDER_PATH, owaDir.getPath()));
+	}
+	
+	@After
+	public void deleteTempOwaDir() {
+		owaDir.delete();
 	}
 	
 	@Test
 	public void shouldNotifyListenerWhenInstallingApp() throws Exception {
-		File file = new File("src/test/resources/designer.zip".replace("/", File.separator));
-		appManager.installApp(file, "designer.zip", "http://localhost:8080");
+		appManager.installApp(getFile("/designer.zip"), "designer.zip", "http://localhost:8080");
 		verify(listener).installedApp(any(App.class));
 	}
 	
 	@Test
 	public void shouldNotifyListenerWhenDeletingApp() throws Exception {
 		String APP_NAME = "Polymer designer";
-		File file = new File("src/test/resources/designer.zip".replace("/", File.separator));
-		appManager.installApp(file, "designer.zip", "http://localhost:8080");
+		appManager.installApp(getFile("/designer.zip"), "designer.zip", "http://localhost:8080");
 		App app = findApp(APP_NAME);
 		Mockito.reset(listener);
 		
@@ -73,14 +77,16 @@ public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 		verify(listener).deletedApp(app);
 	}
 	
+	private File getFile(String file) {
+		URL url = getClass().getResource(file);
+		return new File(url.getPath());
+	}
+	
 	@Test
 	public void shouldDeployToDeployedNameDirectory() throws Exception {
 		//given
-		File destinationDirectory = new File("owa/uicommons-customized");
-		if (destinationDirectory.exists()) {
-			FileUtils.forceDelete(destinationDirectory);
-		}
-		File file = new File("src/test/resources/refapp-uicommons-customized.zip".replace("/", File.separator));
+		File destinationDirectory = new File(owaDir, "uicommons-customized");
+		File file = getFile("/refapp-uicommons-customized.zip");
 		
 		//when
 		appManager.installApp(file, "refapp-uicommons-customized.zip", "http://localhost:8080");
@@ -93,21 +99,21 @@ public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 		assertThat(destinationDirectory, exists());
 		assertThat(new File(destinationDirectory, "manifest.webapp"), exists());
 	}
-
+	
 	@Test
 	public void shouldOverwriteAppWithSameDeployedName() throws Exception {
-		File destinationDirectory = new File("owa/uicommons-customized");
+		File destinationDirectory = new File(owaDir, "uicommons-customized");
 		//given
-		File refappCustomizedApp = new File("src/test/resources/refapp-uicommons-customized.zip".replace("/", File.separator));
+		File refappCustomizedApp = getFile("/refapp-uicommons-customized.zip");
 		appManager.installApp(refappCustomizedApp, "refapp-uicommons-customized.zip", "http://localhost:8080");
 		// file 'otherdistro.marker' is used to determine whether refapp-uicommons-customized app
 		// had been replaced with otherdistro-uicommons-customized app
 		assertThat(new File(destinationDirectory, "otherdistro.marker"), not(exists()));
-		File otherCustomizedApp = new File("src/test/resources/otherdistro-uicommons-customized.zip".replace("/", File.separator));
-
+		File otherCustomizedApp = getFile("/otherdistro-uicommons-customized.zip");
+		
 		//when other app with deployed name 'uicommons-customized'
 		appManager.installApp(otherCustomizedApp, "otherdistro-uicommons-customized.zip", "http://localhost:8080");
-
+		
 		//then check if marker file has been deployed
 		assertThat(new File(destinationDirectory, "otherdistro.marker"), exists());
 	}
@@ -120,20 +126,21 @@ public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 		}
 		return null;
 	}
-
-	private Matcher<File> exists(){
+	
+	private Matcher<File> exists() {
 		return new BaseMatcher<File>() {
+			
 			@Override
 			public boolean matches(Object item) {
 				final File file = (File) item;
 				return file.exists();
 			}
-
+			
 			@Override
 			public void describeTo(Description description) {
 				description.appendText("file should exist");
 			}
-
+			
 			@Override
 			public void describeMismatch(Object item, Description description) {
 				description.appendText("file does not exist");

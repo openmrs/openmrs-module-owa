@@ -37,7 +37,6 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.GlobalProperty;
-import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
@@ -52,7 +51,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.zip.ZipEntry;
 
 public class DefaultAppManager implements AppManager {
 	
@@ -112,7 +110,6 @@ public class DefaultAppManager implements AppManager {
 				}
 
 				String dest = getAppFolderPath() + File.separator + deployedName;
-
 				unzip(zip, dest);
 
 				// ---------------------------------------------------------------------
@@ -147,7 +144,7 @@ public class DefaultAppManager implements AppManager {
 			reloadApps(); // Reload app state
 		}
 	}
-
+	
 	private void unzip(ZipFile zip, String dest) throws IOException {
 		Enumeration<? extends ZipArchiveEntry> entries = zip.getEntries();
 		while (entries.hasMoreElements()) {
@@ -156,16 +153,18 @@ public class DefaultAppManager implements AppManager {
 			if (entry.isDirectory()) {
 				entryDestination.mkdirs();
 			} else {
-				entryDestination.getParentFile().mkdirs();
-				InputStream in = zip.getInputStream(entry);
-				OutputStream out = new FileOutputStream(dest);
-				IOUtils.copy(in, out);
-				IOUtils.closeQuietly(in);
-				out.close();
+				if (!entryDestination.getParentFile().exists()) {
+					entryDestination.getParentFile().mkdirs();
+				}
+				try (InputStream in = zip.getInputStream(entry)) {
+					try (OutputStream out = new FileOutputStream(entryDestination)) {
+						IOUtils.copy(in, out);
+					}
+				}
 			}
 		}
 	}
-
+	
 	@Override
 	public boolean exists(String appName) {
 		for (App app : getApps()) {
