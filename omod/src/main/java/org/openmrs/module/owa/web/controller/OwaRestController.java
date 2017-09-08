@@ -37,6 +37,11 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * @author Saptarshi Purkayastha
  */
+
+/**
+ * @deprecated use {@link OwaManagerRestController}
+ */
+@Deprecated
 @Controller
 public class OwaRestController {
 	
