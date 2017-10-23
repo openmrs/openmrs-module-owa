@@ -6,6 +6,10 @@
 package org.openmrs.module.owa.activator;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.NameFileFilter;
+import org.apache.commons.io.filefilter.OrFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,6 +23,8 @@ import org.springframework.web.context.ServletContextAware;
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -70,19 +76,21 @@ public class OwaActivator implements ModuleActivator, ServletContextAware {
 		}
 		
 		String openmrsRootPath = servletContext.getRealPath("/");
-		String absPath = new File(openmrsRootPath, "WEB-INF" + File.separator + "view" + File.separator + "module")
-		        .getAbsolutePath();
-		
-		File dir = new File(absPath);
+
+		File bundledOwas = new File(openmrsRootPath, "WEB-INF" + File.separator + "bundledOwas");
+		File moduleBundledOwas = new File(openmrsRootPath, "WEB-INF" + File.separator + "view" + File.separator + "module");
 		try {
-			List<File> files = (List<File>) FileUtils.listFiles(dir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+			List<File> files = new ArrayList<>();
+			IOFileFilter owaFileFilter = new OrFileFilter(new SuffixFileFilter(".owa"), new NameFileFilter("manifest.webapp"));
+			files.addAll(FileUtils.listFiles(bundledOwas, owaFileFilter, TrueFileFilter.INSTANCE));
+			files.addAll(FileUtils.listFiles(moduleBundledOwas, owaFileFilter, TrueFileFilter.INSTANCE));
 			for (File file : files) {
 				if (file.getName().endsWith(".owa")) {
 					File dest = new File(owaAppFolder, file.getName());
 					FileUtils.deleteQuietly(dest);
 					FileUtils.copyFile(file, dest);
 					log.info("Copying owa file from: " + file + " to " + dest);
-				} else if (file.getCanonicalPath().contains("manifest.webapp")) {
+				} else if (file.getName().equals("manifest.webapp")) {
 					File source = file.getParentFile();
 					File dest = new File(owaAppFolder, source.getName());
 					FileUtils.deleteQuietly(dest);
