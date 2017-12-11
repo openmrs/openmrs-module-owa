@@ -82,7 +82,9 @@ public class OwaActivator implements ModuleActivator, ServletContextAware {
 		try {
 			List<File> files = new ArrayList<>();
 			IOFileFilter owaFileFilter = new OrFileFilter(new SuffixFileFilter(".owa"), new NameFileFilter("manifest.webapp"));
-			files.addAll(FileUtils.listFiles(bundledOwas, owaFileFilter, TrueFileFilter.INSTANCE));
+			if (bundledOwas.exists()) {
+				files.addAll(FileUtils.listFiles(bundledOwas, owaFileFilter, TrueFileFilter.INSTANCE));
+			}
 			files.addAll(FileUtils.listFiles(moduleBundledOwas, owaFileFilter, TrueFileFilter.INSTANCE));
 			for (File file : files) {
 				if (file.getName().endsWith(".owa")) {
