@@ -9,6 +9,7 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.messagesource.MessageSourceService;
+import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.web.WebConstants;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
@@ -114,5 +115,27 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		controller.upload(multifile, request, response);
 		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
+	}
+	
+	@Test
+	public void install_rightDownloadUrl() throws Exception {
+		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/installapp");
+		HttpServletResponse response = new MockHttpServletResponse();
+		String downloadUrl = "https://bintray.com/openmrs/owa/download_file?file_path=cohortbuilder-1.0.0-beta.zip";
+		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
+		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
+		List<App> appList = controller.install(requestData, request, response);
+		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
+	}
+	
+	@Test
+	public void install_wrongDownloadUrl() throws Exception {
+		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/installapp");
+		HttpServletResponse response = new MockHttpServletResponse();
+		String downloadUrl = "https://bintray.com/openmrs/owa/download_file?file_path=notAZip.zip";
+		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
+		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
+		List<App> appList = controller.install(requestData, request, response);
+		Assert.assertEquals("owa.not_a_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
 }
