@@ -163,7 +163,7 @@ public class OwaRestController {
 				if (!url.isEmpty()) {
 					InputStream inputStream = ModuleUtil.getURLStream(downloadUrl);
 					log.warn("url pathname: " + downloadUrl.getPath());
-					String fileName = downloadUrl.getQuery().substring(downloadUrl.getQuery().lastIndexOf("=") + 1);
+					String fileName = urlObject.getFileName() != null ? urlObject.getFileName() + ".zip" : downloadUrl.getQuery().substring(downloadUrl.getQuery().lastIndexOf("=") + 1);
 					File file = ModuleUtil.insertModuleFile(inputStream, fileName);
 					try (ZipFile zip = new ZipFile(file)) {
 						if (zip.size() == 0) {
