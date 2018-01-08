@@ -51,12 +51,12 @@ public class OwaManageController {
 	}
 	
 	@RequestMapping(value = "/deleteApp", method = RequestMethod.GET)
-	public String deleteApp(@RequestParam("appName") String appName, ModelMap model) {
+	public String deleteApp(@RequestParam("appName") String appName, @RequestParam(value= "returnURL", required = false) String returnURL, ModelMap model) {
 		if (appName != null && Context.hasPrivilege("Manage OWA")) {
 			appManager.deleteApp(appName);
 			model.clear();
 		}
-		return "redirect:manage.form";
+		return returnURL != null ? returnURL : "redirect:manage.form";
 	}
 	
 	@RequestMapping(value = "/manager", method = RequestMethod.GET)
