@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,8 @@ public class OwaManageController {
 	}
 	
 	@RequestMapping(value = "/deleteApp", method = RequestMethod.GET)
-	public String deleteApp(@RequestParam("appName") String appName, @RequestParam(value= "returnURL", required = false) String returnURL, ModelMap model) {
+	public String deleteApp(@RequestParam("appName") String appName,
+	        @RequestParam(value = "returnURL", required = false) String returnURL, ModelMap model) {
 		if (appName != null && Context.hasPrivilege("Manage OWA")) {
 			appManager.deleteApp(appName);
 			model.clear();
