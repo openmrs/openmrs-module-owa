@@ -6,6 +6,7 @@ package org.openmrs.module.owa.web.controller;
  * this file, You can obtain one at http://license.openmrs.org
  */
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -47,18 +48,18 @@ import org.springframework.web.multipart.MultipartFile;
 @Deprecated
 @Controller
 public class OwaRestController {
-	
+
 	private static final Log log = LogFactory.getLog(OwaRestController.class);
-	
+
 	// -------------------------------------------------------------------------
 	// Dependencies
 	// -------------------------------------------------------------------------
 	@Autowired
 	private AppManager appManager;
-	
+
 	@Autowired
 	private MessageSourceService messageSourceService;
-	
+
 	// -------------------------------------------------------------------------
 	// REST implementation
 	// -------------------------------------------------------------------------
@@ -72,7 +73,7 @@ public class OwaRestController {
 	        }
 	        return appList;
 		}
-	
+
 	@RequestMapping(value = "/rest/owa/settings", method = RequestMethod.GET)
         @ResponseBody
         public List<GlobalProperty> getSettings() {
@@ -84,7 +85,7 @@ public class OwaRestController {
             }
             return owaSettings;
         }
-	
+
 	@RequestMapping(value = "/rest/owa/settings", method = RequestMethod.POST)
         @ResponseBody
         public List<GlobalProperty> updateSettings(List<GlobalProperty> settings) {
@@ -99,7 +100,7 @@ public class OwaRestController {
             }
             return owaSettings;
         }
-	
+
 	@RequestMapping(value = "/rest/owa/addapp", method = RequestMethod.POST)
         @ResponseBody
         public List<App> upload(@RequestParam("file") MultipartFile file, HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -108,7 +109,7 @@ public class OwaRestController {
                 String message;
                 HttpSession session = request.getSession();
                 if (!file.isEmpty()) {
-                    String fileName = file.getOriginalFilename();
+					String fileName = file.getOriginalFilename();
                     File uploadedFile = new File(file.getOriginalFilename());
                     file.transferTo(uploadedFile);
                     try (ZipFile zip = new ZipFile(uploadedFile)) {
@@ -146,12 +147,12 @@ public class OwaRestController {
             }
             return appList;
         }
-	
+
 	@RequestMapping(value = "/rest/owa/installapp", method = RequestMethod.POST)
 		@ResponseBody
 		public List<App> install(@RequestBody InstallAppRequestObject urlObject, HttpServletRequest request, HttpServletResponse response) throws IOException {
 			List<App> appList = new ArrayList<>();
-	
+
 			String url = urlObject.getUrlValue();
 			URL downloadUrl = null;
 			if (ResourceUtils.isUrl(url)) {
@@ -162,8 +163,21 @@ public class OwaRestController {
 				HttpSession session = request.getSession();
 				if (!url.isEmpty()) {
 					InputStream inputStream = ModuleUtil.getURLStream(downloadUrl);
-					log.warn("url pathname: " + downloadUrl.getPath());
-					String fileName = downloadUrl.getQuery().substring(downloadUrl.getQuery().lastIndexOf("=") + 1);
+					log.warn("Url pathname: " + downloadUrl.getPath());
+					String fileName = urlObject.getFileName() + ".zip";
+					final String fileMatch=  fileName;
+					File dir = new File("./appdata/modules/");
+					File[] matches = dir.listFiles(new FilenameFilter(){
+						public boolean accept(File dir, String name)
+						{
+							return name.equals(fileMatch);
+						}
+					});
+
+					if(matches != null && matches.length > 0){
+						matches[0].delete();
+					}
+
 					File file = ModuleUtil.insertModuleFile(inputStream, fileName);
 					try (ZipFile zip = new ZipFile(file)) {
 						if (zip.size() == 0) {
