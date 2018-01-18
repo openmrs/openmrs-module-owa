@@ -1,17 +1,24 @@
 package org.openmrs.module.owa.web.controller;
 
 public class InstallAppRequestObject {
-	
+
 	private String urlValue;
 	
+	private String fileName;
+
 	public InstallAppRequestObject() {
 	}
-	
-	public InstallAppRequestObject(String urlValue) {
+
+	public InstallAppRequestObject(String urlValue, String fileName) {
 		this.urlValue = urlValue;
+		this.fileName = fileName;
 	}
-	
+
 	public String getUrlValue() {
-		return this.urlValue;
+		return urlValue;
+	}
+
+	public String getFileName() {
+		return fileName;
 	}
 }

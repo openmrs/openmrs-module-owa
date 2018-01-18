@@ -47,164 +47,175 @@ import org.springframework.web.multipart.MultipartFile;
 @Deprecated
 @Controller
 public class OwaRestController {
-	
+
 	private static final Log log = LogFactory.getLog(OwaRestController.class);
-	
+
 	// -------------------------------------------------------------------------
 	// Dependencies
 	// -------------------------------------------------------------------------
 	@Autowired
 	private AppManager appManager;
-	
+
 	@Autowired
 	private MessageSourceService messageSourceService;
-	
+
 	// -------------------------------------------------------------------------
 	// REST implementation
 	// -------------------------------------------------------------------------
 	@RequestMapping(value = "/rest/owa/applist", method = RequestMethod.GET)
-		@ResponseBody
-		public List<App> getAppList() {
-			List<App> appList = new ArrayList<>();
-	        if(Context.hasPrivilege("Manage OWA")){
-	        	appManager.reloadApps();
-	        	appList = appManager.getApps();
-	        }
-	        return appList;
+	@ResponseBody
+	public List<App> getAppList() {
+		List<App> appList = new ArrayList<>();
+		if(Context.hasPrivilege("Manage OWA")){
+			appManager.reloadApps();
+			appList = appManager.getApps();
 		}
-	
+		return appList;
+	}
+
 	@RequestMapping(value = "/rest/owa/settings", method = RequestMethod.GET)
-        @ResponseBody
-        public List<GlobalProperty> getSettings() {
-            List<GlobalProperty> owaSettings = new ArrayList<>();
-            if(Context.hasPrivilege("Manage OWA")){
-                    owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_FOLDER_PATH));
-                    owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_BASE_URL));
-                    owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_STORE_URL));
-            }
-            return owaSettings;
-        }
-	
+	@ResponseBody
+	public List<GlobalProperty> getSettings() {
+		List<GlobalProperty> owaSettings = new ArrayList<>();
+		if(Context.hasPrivilege("Manage OWA")){
+			owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_FOLDER_PATH));
+			owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_BASE_URL));
+			owaSettings.add(Context.getAdministrationService().getGlobalPropertyObject(AppManager.KEY_APP_STORE_URL));
+		}
+		return owaSettings;
+	}
+
 	@RequestMapping(value = "/rest/owa/settings", method = RequestMethod.POST)
-        @ResponseBody
-        public List<GlobalProperty> updateSettings(List<GlobalProperty> settings) {
-            List<GlobalProperty> owaSettings = new ArrayList<>();
-            if(Context.hasPrivilege("Manage OWA")){
-                if (null != settings) {
-                    for (GlobalProperty gp : settings) {
-                        Context.getAdministrationService().saveGlobalProperty(gp);
-                        owaSettings.add(gp);
-                    }
-                }
-            }
-            return owaSettings;
-        }
-	
-	@RequestMapping(value = "/rest/owa/addapp", method = RequestMethod.POST)
-        @ResponseBody
-        public List<App> upload(@RequestParam("file") MultipartFile file, HttpServletRequest request, HttpServletResponse response) throws IOException {
-            List<App> appList = new ArrayList<>();
-            if(Context.hasPrivilege("Manage OWA")){
-                String message;
-                HttpSession session = request.getSession();
-                if (!file.isEmpty()) {
-                    String fileName = file.getOriginalFilename();
-                    File uploadedFile = new File(file.getOriginalFilename());
-                    file.transferTo(uploadedFile);
-                    try (ZipFile zip = new ZipFile(uploadedFile)) {
-                        if (zip.size() == 0) {
-                            message = messageSourceService.getMessage("owa.blank_zip");
-                            log.warn("Zip file is empty");
-                            session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
-                            response.sendError(500, message);
-                        } else {
-                        	ZipEntry entry = zip.getEntry("manifest.webapp");
-                        	if (entry == null) {
-                        		message = messageSourceService.getMessage("owa.manifest_not_found");
-                        		log.warn("Manifest file could not be found in app");
-                        		uploadedFile.delete();
-                        		session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
-                        		response.sendError(500, message);
-                        	} else {
-                        		String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
-                        				+ request.getServerPort() + request.getContextPath();
-                        		appManager.installApp(uploadedFile, fileName, contextPath);
-                        		message = messageSourceService.getMessage("owa.app_installed");
-                        		session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
-                        	}
-                        }
-                    } catch (Exception e) {
-                        message = messageSourceService.getMessage("owa.not_a_zip");
-                        log.warn("App is not a zip archive");
-                        uploadedFile.delete();
-                        session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
-                        response.sendError(500, message);
-                    }
-                }
-                appManager.reloadApps();
-                appList = appManager.getApps();
-            }
-            return appList;
-        }
-	
-	@RequestMapping(value = "/rest/owa/installapp", method = RequestMethod.POST)
-		@ResponseBody
-		public List<App> install(@RequestBody InstallAppRequestObject urlObject, HttpServletRequest request, HttpServletResponse response) throws IOException {
-			List<App> appList = new ArrayList<>();
-	
-			String url = urlObject.getUrlValue();
-			URL downloadUrl = null;
-			if (ResourceUtils.isUrl(url)) {
-				downloadUrl = new URL(url);
+	@ResponseBody
+	public List<GlobalProperty> updateSettings(List<GlobalProperty> settings) {
+		List<GlobalProperty> owaSettings = new ArrayList<>();
+		if(Context.hasPrivilege("Manage OWA")){
+			if (null != settings) {
+				for (GlobalProperty gp : settings) {
+					Context.getAdministrationService().saveGlobalProperty(gp);
+					owaSettings.add(gp);
+				}
 			}
-			if (Context.hasPrivilege("Manage OWA")) {
-				String message;
-				HttpSession session = request.getSession();
-				if (!url.isEmpty()) {
-					InputStream inputStream = ModuleUtil.getURLStream(downloadUrl);
-					log.warn("url pathname: " + downloadUrl.getPath());
-					String fileName = downloadUrl.getQuery().substring(downloadUrl.getQuery().lastIndexOf("=") + 1);
-					File file = ModuleUtil.insertModuleFile(inputStream, fileName);
-					try (ZipFile zip = new ZipFile(file)) {
-						if (zip.size() == 0) {
-							message = messageSourceService.getMessage("owa.blank_zip");
-							log.warn("Zip file is empty");
+		}
+		return owaSettings;
+	}
+
+	@RequestMapping(value = "/rest/owa/addapp", method = RequestMethod.POST)
+	@ResponseBody
+	public List<App> upload(@RequestParam("file") MultipartFile file, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		List<App> appList = new ArrayList<>();
+		if(Context.hasPrivilege("Manage OWA")){
+			String message;
+			HttpSession session = request.getSession();
+			if (!file.isEmpty()) {
+				String fileName = file.getOriginalFilename();
+				File uploadedFile = new File(file.getOriginalFilename());
+				file.transferTo(uploadedFile);
+				try (ZipFile zip = new ZipFile(uploadedFile)) {
+					if (zip.size() == 0) {
+						message = messageSourceService.getMessage("owa.blank_zip");
+						uploadedFile.delete();
+						log.warn("Zip file is empty");
+						session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
+						response.sendError(500, message);
+					} else {
+						ZipEntry entry = zip.getEntry("manifest.webapp");
+						if (entry == null) {
+							message = messageSourceService.getMessage("owa.manifest_not_found");
+							log.warn("Manifest file could not be found in app");
+							uploadedFile.delete();
 							session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
 							response.sendError(500, message);
 						} else {
-							ZipEntry entry = zip.getEntry("manifest.webapp");
-							if (entry == null) {
-								message = messageSourceService.getMessage("owa.manifest_not_found");
-								log.warn("Manifest file could not be found in app");
-								file.delete();
-								session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
-								response.sendError(500, message);
-							} else {
-								String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
-								        + request.getServerPort() + request.getContextPath();
-								appManager.installApp(file, fileName, contextPath);
-								message = messageSourceService.getMessage("owa.app_installed");
-								response.setStatus(200);
-								session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
-							}
+							String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
+									+ request.getServerPort() + request.getContextPath();
+							appManager.installApp(uploadedFile, fileName, contextPath);
+							uploadedFile.delete();
+							message = messageSourceService.getMessage("owa.app_installed");
+							session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
 						}
 					}
-					catch (Exception e) {
-						message = messageSourceService.getMessage("owa.not_a_zip");
-						log.warn("App is not a zip archive");
+				} catch (Exception e) {
+					message = messageSourceService.getMessage("owa.not_a_zip");
+					log.warn("App is not a zip archive");
+					uploadedFile.delete();
+					session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
+					response.sendError(500, message);
+				}
+			}
+			appManager.reloadApps();
+			appList = appManager.getApps();
+		}
+		return appList;
+	}
+
+	@RequestMapping(value = "/rest/owa/installapp", method = RequestMethod.POST)
+	@ResponseBody
+	public List<App> install(@RequestBody InstallAppRequestObject urlObject, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		List<App> appList = new ArrayList<>();
+
+		String url = urlObject.getUrlValue();
+		String fileName = urlObject.getFileName();
+		if(fileName == null || fileName == ""){
+			throw new  NullPointerException(
+				"File name must be passed for installation"
+			);
+		}
+		URL downloadUrl = null;
+		if (ResourceUtils.isUrl(url)) {
+			downloadUrl = new URL(url);
+		}
+		if (Context.hasPrivilege("Manage OWA")) {
+			String message;
+			HttpSession session = request.getSession();
+			if (!url.isEmpty()) {
+				InputStream inputStream = ModuleUtil.getURLStream(downloadUrl);
+				log.info("Url pathname: " + downloadUrl.getPath());
+				fileName += ".zip";
+				final String fileMatch=  fileName;
+				File file = ModuleUtil.insertModuleFile(inputStream, fileName);
+				try (ZipFile zip = new ZipFile(file)) {
+					if (zip.size() == 0) {
+						message = messageSourceService.getMessage("owa.blank_zip");
 						file.delete();
+						log.warn("Zip file is empty");
 						session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
 						response.sendError(500, message);
+					} else {
+						ZipEntry entry = zip.getEntry("manifest.webapp");
+						if (entry == null) {
+							message = messageSourceService.getMessage("owa.manifest_not_found");
+							log.warn("Manifest file could not be found in app");
+							file.delete();
+							session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
+							response.sendError(500, message);
+						} else {
+							String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
+									+ request.getServerPort() + request.getContextPath();
+							appManager.installApp(file, fileName, contextPath);
+							file.delete();
+							message = messageSourceService.getMessage("owa.app_installed");
+							response.setStatus(200);
+							session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
+						}
 					}
-				} else {
-					message = messageSourceService.getMessage("owa.invalid_url");
-					log.warn("Invalid url");
-					session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
-					response.sendError(400, message);
 				}
-				appManager.reloadApps();
-				appList = appManager.getApps();
+				catch (Exception e) {
+					message = messageSourceService.getMessage("owa.not_a_zip");
+					log.warn("App is not a zip archive");
+					file.delete();
+					session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
+					response.sendError(500, message);
+				}
+			} else {
+				message = messageSourceService.getMessage("owa.invalid_url");
+				log.warn("Invalid url");
+				session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
+				response.sendError(400, message);
 			}
-			return appList;
+			appManager.reloadApps();
+			appList = appManager.getApps();
 		}
+		return appList;
+	}
 }
