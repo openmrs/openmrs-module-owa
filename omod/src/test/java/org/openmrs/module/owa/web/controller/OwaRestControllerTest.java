@@ -123,7 +123,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		HttpServletResponse response = new MockHttpServletResponse();
 		String downloadUrl = "https://bintray.com/openmrs/owa/download_file?file_path=cohortbuilder-1.0.0-beta.zip";
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
-		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
+		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl, "Cohort Builder OWA");
 		List<App> appList = controller.install(requestData, request, response);
 		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
 	}
@@ -134,7 +134,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		HttpServletResponse response = new MockHttpServletResponse();
 		String downloadUrl = "https://bintray.com/openmrs/owa/download_file?file_path=notAZip.zip";
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
-		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
+		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl, "Cohort Builder OWA");
 		List<App> appList = controller.install(requestData, request, response);
 		Assert.assertEquals("owa.not_a_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
