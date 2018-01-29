@@ -218,4 +218,10 @@ public class OwaRestController {
 		}
 		return appList;
 	}
+
+	@RequestMapping(value = "/rest/owa/allowModuleWebUpload", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean allowWebAdmin(HttpServletRequest request, HttpServletResponse response) {
+		 return ModuleUtil.allowAdmin();
+	}
 }
