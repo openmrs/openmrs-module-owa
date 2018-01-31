@@ -9,6 +9,7 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.messagesource.MessageSourceService;
+import org.openmrs.module.ModuleUtil;
 import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.web.WebConstants;
@@ -137,5 +138,17 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl, "Cohort Builder OWA");
 		List<App> appList = controller.install(requestData, request, response);
 		Assert.assertEquals("owa.not_a_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
+	}
+
+	@Test
+	public void allowWebAdmin_shouldNotReturnNull() {
+		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "GET",
+		        "/rest/owa/allowModuleWebUpload");
+		HttpServletResponse response = new MockHttpServletResponse();
+		boolean allowModuleWebUpload = ModuleUtil.allowAdmin();
+		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
+		boolean allowAdmin = controller.allowWebAdmin(request, response);
+		Assert.assertNotNull(allowAdmin);
+		Assert.assertEquals(allowModuleWebUpload, allowAdmin);
 	}
 }
