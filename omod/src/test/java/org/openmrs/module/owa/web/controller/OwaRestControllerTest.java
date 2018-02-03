@@ -14,6 +14,7 @@ import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.web.WebConstants;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
@@ -112,7 +113,8 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/addapp");
 		HttpServletResponse response = new MockHttpServletResponse();
 		FileInputStream file = new FileInputStream(new File("src/test/resources/designer.zip".replace("/", File.separator)));
-		MockMultipartFile multifile = new MockMultipartFile("properZipFile", "designer.zip", "application/zip,.zip", file);
+		MockMultipartFile multifile = new MockMultipartFile("properZipFile", "designer-1.0.0.zip", "application/zip,.zip",
+		        file);
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		controller.upload(multifile, request, response);
 		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
@@ -124,8 +126,9 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		HttpServletResponse response = new MockHttpServletResponse();
 		String downloadUrl = "https://bintray.com/openmrs/owa/download_file?file_path=cohortbuilder-1.0.0-beta.zip";
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
-		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl, "Cohort Builder OWA");
-		List<App> appList = controller.install(requestData, request, response);
+		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
+		ResponseEntity<? extends Object> checkInstall = controller.install(requestData, request, response);
+		Assert.assertTrue((Boolean) checkInstall.getBody());
 		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
 	}
 	
@@ -135,11 +138,36 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		HttpServletResponse response = new MockHttpServletResponse();
 		String downloadUrl = "https://bintray.com/openmrs/owa/download_file?file_path=notAZip.zip";
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
-		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl, "Cohort Builder OWA");
-		List<App> appList = controller.install(requestData, request, response);
+		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
+		ResponseEntity<? extends Object> checkInstall = controller.install(requestData, request, response);
+		Assert.assertFalse((Boolean) checkInstall.getBody());
 		Assert.assertEquals("owa.not_a_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
-
+	
+	@Test
+	public void install_missingFilePath() throws Exception {
+		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/installapp");
+		HttpServletResponse response = new MockHttpServletResponse();
+		String downloadUrl = "https://bintray.com/openmrs/owa/download_file";
+		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
+		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
+		ResponseEntity<? extends Object> checkInstall = controller.install(requestData, request, response);
+		Assert.assertFalse((Boolean) checkInstall.getBody());
+		Assert.assertEquals("Invalid URL", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
+	}
+	
+	@Test
+	public void install_urlEndsWithFileName() throws Exception {
+		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/installapp");
+		HttpServletResponse response = new MockHttpServletResponse();
+		String downloadUrl = "https://dl.bintray.com/openmrs/owa/cohortbuilder-1.0.0-beta.zip";
+		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
+		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
+		ResponseEntity<? extends Object> checkInstall = controller.install(requestData, request, response);
+		Assert.assertTrue((Boolean) checkInstall.getBody());
+		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
+	}
+	
 	@Test
 	public void allowWebAdmin_shouldNotReturnNull() {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "GET",
