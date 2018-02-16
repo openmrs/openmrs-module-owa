@@ -44,4 +44,12 @@ public class OwaUtils {
 		}
 		return fileName;
 	}
+	
+	/**
+	 * @param requestURL URL to be checked
+	 * @return Boolean object to confirm whether URL contains "addonmanager"
+	 */
+	public static Boolean checkIfAddonManager(String requestURL) {
+		return requestURL.contains("/owa/addonmanager/index.html") ? true : false;
+	}
 }

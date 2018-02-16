@@ -8,6 +8,7 @@ package org.openmrs.module.owa.filter;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.owa.AppManager;
+import org.openmrs.module.owa.utils.OwaUtils;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -49,7 +50,7 @@ public class OwaFilter implements Filter {
 			requestURL = request.getServletPath();
 		}
 		
-		if (Context.isAuthenticated()) {
+		if (OwaUtils.checkIfAddonManager(requestURL) || Context.isAuthenticated()) {
 			if (requestURL.startsWith(owaBasePath)) {
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
 				req.getRequestDispatcher(newURL).forward(req, res);
@@ -65,7 +66,7 @@ public class OwaFilter implements Filter {
 			}
 		}
 	}
-	
+
 	//owaBasePath can be either full path (must contain protocol) or relative servlet path
 	public static boolean isFullBasePath(String owaBasePath) {
 		return owaBasePath.contains("://");
