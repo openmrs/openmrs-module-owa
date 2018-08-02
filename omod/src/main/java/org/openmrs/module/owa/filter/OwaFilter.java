@@ -59,6 +59,10 @@ public class OwaFilter implements Filter {
 		} else {
 			if (requestURL.startsWith(owaBasePath)) {
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/redirectServlet");
+				String loginUrl = Context.getAdministrationService().getGlobalProperty("login.url", "login.htm");
+				if (requestURL.contains(loginUrl)) {
+					newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
+				}
 				req.getRequestDispatcher(newURL).forward(req, res);
 			} else {
 				chain.doFilter(req, res);
