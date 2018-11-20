@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.zip.ZipFile;
 import java.util.List;
 
 public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
@@ -75,13 +76,21 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 	 */
 	@Test
 	public void upload_caseNotAZipFile() throws Exception {
+		String errorMessage = null;
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/addapp");
 		HttpServletResponse response = new MockHttpServletResponse();
 		FileInputStream file = new FileInputStream(new File("src/test/resources/testing".replace("/", File.separator)));
+		
+		try(ZipFile zip = new ZipFile(new File("src/test/resources/testing".replace("/", File.separator)))){
+			
+		}catch(Exception e){
+			errorMessage = e.getMessage();
+		}		
+		
 		MockMultipartFile mmf = new MockMultipartFile("nonZipFile", "testing", null, file);
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		controller.upload(mmf, request, response);
-		Assert.assertEquals("owa.not_a_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
+		Assert.assertEquals(errorMessage , request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
 	
 	@Test
