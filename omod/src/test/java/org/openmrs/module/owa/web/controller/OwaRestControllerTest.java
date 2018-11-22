@@ -75,7 +75,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 	 * OwaRestController upload method test casing.
 	 */
 	@Test
-	public void upload_caseNotAZipFile() throws Exception {
+	public void upload_caseProtectedOrNotAZipFile() throws Exception {
 		String errorMessage = null;
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/addapp");
 		HttpServletResponse response = new MockHttpServletResponse();
