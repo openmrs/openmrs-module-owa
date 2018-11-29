@@ -20,6 +20,7 @@ import org.springframework.mock.web.MockServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.zip.ZipFile;
 import java.net.URL;
 
 /**
@@ -55,12 +56,21 @@ public class AddAppControllerTest extends BaseModuleWebContextSensitiveTest {
 	 */
 	@Test
 	public void testUploadofNotaZipArchieve() throws Exception {
+		String errorMessage = null;
+		
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/module/owa/addApp.htm");
 		URL url = OpenmrsClassLoader.getInstance().getResource("testing");
+
+		try(ZipFile zip = new ZipFile(new File(url.getFile()))){
+			
+		}catch(Exception e){
+			errorMessage = e.getMessage();
+		}		
+		
 		MockMultipartFile multifile = new MockMultipartFile("testFile", "testing", null, new FileInputStream(url.getFile()));
 		AddAppController controller = (AddAppController) applicationContext.getBean("addAppController");
 		controller.upload(multifile, request);
-		Assert.assertEquals("owa.not_a_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
+		Assert.assertEquals(errorMessage, request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
 	
 	@Test

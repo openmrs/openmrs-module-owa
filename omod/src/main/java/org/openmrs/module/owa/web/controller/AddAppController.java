@@ -95,8 +95,8 @@ public class AddAppController {
                                     }
                                 }
                                 catch(Exception e) {
-                                    message = messageSourceService.getMessage("owa.not_a_zip");
-                                        log.warn("App is not a zip archive");
+                                    message = e.getMessage();
+                                        log.warn(message);
                                     uploadedFile.delete();
                                     session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
                                     return "redirect:manage.form";
