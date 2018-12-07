@@ -38,9 +38,15 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.Module;
+import org.openmrs.module.ModuleUtil;
+import org.openmrs.module.ModuleFactory;
 import org.openmrs.module.owa.App;
+import org.openmrs.module.owa.AppRequirements;
+import org.openmrs.module.owa.AppRequiredModule;
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.module.owa.OwaListener;
+import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -51,6 +57,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.lang.StringBuilder;
 
 public class DefaultAppManager implements AppManager {
 	
@@ -307,5 +314,88 @@ public class DefaultAppManager implements AppManager {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Returns String message of missing requirements and empty String if all the requirements are
+	 * installed or if no special requirements are needed.
+	 * 
+	 * @param file uploaded file of owa that contains Manifest.webapp entry
+	 * @param startedModules list of started modules
+	 * @return message about missing requirements
+	 */
+	public String extractMissingRequirementsMessage(File file, List<Module> startedModules) throws IOException {
+		
+		StringBuilder errorMessage = new StringBuilder("");
+		
+		App app = getAppDefinition(file);
+		AppRequirements appRequirements = null;
+		
+		if (null != app.getActivities().getOpenmrs().getRequirements()) {
+			appRequirements = app.getActivities().getOpenmrs().getRequirements();
+			
+			if (null != appRequirements.getCoreVersion()) {
+				if (!ModuleUtil.matchRequiredVersions(OpenmrsConstants.OPENMRS_VERSION_SHORT,
+				    appRequirements.getCoreVersion())) {
+					
+					errorMessage.append("OpenMRS-core version: ").append(appRequirements.getCoreVersion());
+				}
+			}
+			
+			if (null != appRequirements.getRequiredModules()) {
+				for (AppRequiredModule requiredModule : appRequirements.getRequiredModules()) {
+					boolean moduleStarted = false;
+					String reqVersion = requiredModule.getVersion();
+					for (Module module : startedModules) {
+						if (module.getPackageName().equals(requiredModule.getName())) {
+							
+							if (reqVersion != null && ModuleUtil.matchRequiredVersions(module.getVersion(), reqVersion)) {
+								moduleStarted = true;
+							}
+							break;
+						}
+					}
+					if (!moduleStarted) {
+						errorMessage
+						        .append(", ")
+						        .append(
+						            requiredModule.getName().replace("org.openmrs.module.", "").replace("org.openmrs.", ""))
+						        .append(" version: ").append(reqVersion);
+					}
+				}
+			}
+		}
+		return errorMessage.toString();
+	}
+	
+	@Override
+	public List<Module> getStartedModules() {
+		List startedModules = new ArrayList(ModuleFactory.getStartedModules());
+		return startedModules;
+	}
+	
+	/**
+	 * Returns App app definition from file
+	 * 
+	 * @param file zip file of owa that contains Manifest.webapp entry
+	 * @return App extracted from the manifest.webapp file
+	 */
+	
+	private static App getAppDefinition(File file) throws IOException {
+
+		App app = null;    		
+		ObjectMapper mapper = new ObjectMapper();     
+		mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);		
+		
+		try (ZipFile zipFile = new ZipFile(file)) {
+			ZipArchiveEntry entry = zipFile.getEntry("manifest.webapp");
+			
+			try (InputStream inputStream = zipFile.getInputStream(entry)) { 
+				String manifest = org.apache.commons.io.IOUtils.toString(inputStream);
+				app = mapper.readValue(manifest, App.class);
+				
+			}		
+		}
+		return app;
 	}
 }

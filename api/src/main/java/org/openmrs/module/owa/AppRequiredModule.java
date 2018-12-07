@@ -31,34 +31,34 @@ import java.io.Serializable;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
- * @author Saptarshi
+ * @since 1.11.0
  */
-public class AppOpenmrs implements Serializable {
+public class AppRequiredModule implements Serializable {
 	
 	/**
 	 * Determines if a de-serialized file is compatible with this class.
 	 */
-	private static final long serialVersionUID = -7664121469721457843L;
+	private static final long serialVersionUID = -2643920360187162860L;
 	
-	@JsonProperty("href")
-	private String href;
+	@JsonProperty("name")
+	private String name;
 	
-	@JsonProperty("requirements")
-	private AppRequirements requirements;
+	@JsonProperty("version")
+	private String version;
 	
-	public String getHref() {
-		return href;
+	public String getName() {
+		return name;
 	}
 	
-	public void setHref(String href) {
-		this.href = href;
+	public void setName(String name) {
+		this.name = name;
 	}
 	
-	public AppRequirements getRequirements() {
-		return requirements;
+	public String getVersion() {
+		return version;
 	}
 	
-	public void setRequirements(AppRequirements requirements) {
-		this.requirements = requirements;
+	public void setVersion(String version) {
+		this.version = version;
 	}
 }

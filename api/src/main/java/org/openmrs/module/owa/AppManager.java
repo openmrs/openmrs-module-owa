@@ -30,6 +30,7 @@ package org.openmrs.module.owa;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import org.openmrs.module.Module;
 import org.springframework.stereotype.Component;
 
 /**
@@ -128,4 +129,23 @@ public interface AppManager {
 	 * @param appStoreUrl
 	 */
 	void setAppStoreUrl(String appStoreUrl);
+	
+	/**
+	 * Returns constructed string of missig modules and/or openmrs core with their required modules
+	 * 
+	 * @param startedModules list of started modules
+	 * @param file of webapp containing manifest.webapp
+	 * @return string of missing modules
+	 * @since 1.11.0
+	 */
+	String extractMissingRequirementsMessage(File file, List<Module> startedModules) throws IOException;
+	
+	/**
+	 * Returns List of started modules
+	 * 
+	 * @return list of started modules
+	 * @since 1.11.0
+	 */
+	
+	List<Module> getStartedModules();
 }
