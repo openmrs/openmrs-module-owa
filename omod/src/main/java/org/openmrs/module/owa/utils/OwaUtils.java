@@ -44,4 +44,9 @@ public class OwaUtils {
 		}
 		return fileName;
 	}
+	public static String getStrippedFileName(String passedFileName) {
+		String[] tokens = passedFileName.split("((-|[_])+[0-9])|[\\s]");
+		String fileName = tokens[0];
+		return fileName;
+	}
 }
