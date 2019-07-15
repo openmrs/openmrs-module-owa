@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -24,6 +25,8 @@ import java.io.IOException;
 public class OwaFilter implements Filter {
 	
 	public static final String DEFAULT_BASE_URL = "/owa";
+	
+	private static final String ADD_ON_MANAGER = "addonmanager";
 	
 	private String openmrsPath;
 	
@@ -49,23 +52,23 @@ public class OwaFilter implements Filter {
 			requestURL = request.getServletPath();
 		}
 		
+		String loginUrl = Context.getAdministrationService().getGlobalProperty("login.url", "login.htm");
 		if (Context.isAuthenticated()) {
 			if (requestURL.startsWith(owaBasePath)) {
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
 				req.getRequestDispatcher(newURL).forward(req, res);
 			} else {
-				chain.doFilter(req, res);
+				doFilter(req, res, chain, loginUrl);
 			}
 		} else {
 			if (requestURL.startsWith(owaBasePath)) {
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/redirectServlet");
-				String loginUrl = Context.getAdministrationService().getGlobalProperty("login.url", "login.htm");
-				if (requestURL.contains(loginUrl)) {
+				if (requestURL.contains(loginUrl) || requestURL.contains(ADD_ON_MANAGER)) {
 					newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
 				}
 				req.getRequestDispatcher(newURL).forward(req, res);
 			} else {
-				chain.doFilter(req, res);
+				doFilter(req, res, chain, loginUrl);
 			}
 		}
 	}
@@ -77,6 +80,15 @@ public class OwaFilter implements Filter {
 	
 	@Override
 	public void destroy() {
+	}
+	
+	private void doFilter(ServletRequest req, ServletResponse res, FilterChain chain, String loginUrl) throws IOException, ServletException {
+		HttpServletRequest request = (HttpServletRequest) req;
+		if (loginUrl.contains(ADD_ON_MANAGER) && (request.getServletPath().equals("/index.htm") || request.getServletPath().equals("/login.htm") || request.getServletPath().equals("/"))) {
+			((HttpServletResponse) res).sendRedirect(request.getContextPath() + "/" + loginUrl);
+		} else {
+			chain.doFilter(req, res);
+		}
 	}
 	
 }

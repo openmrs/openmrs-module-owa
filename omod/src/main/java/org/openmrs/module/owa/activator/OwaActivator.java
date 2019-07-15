@@ -14,7 +14,10 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.Module;
 import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.ModuleFactory;
+import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.module.owa.impl.DefaultAppManager;
 import org.openmrs.util.OpenmrsUtil;
@@ -24,7 +27,6 @@ import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -35,6 +37,10 @@ public class OwaActivator implements ModuleActivator, ServletContextAware {
 	protected Log log = LogFactory.getLog(getClass());
 	
 	private static ServletContext servletContext;
+	
+	private static final String LOGIN_URL = "login.url";
+	
+	private static final String ADD_ON_MANAGER_APP = "Add On Manager";
 	
 	public void setServletContext(ServletContext context) {
 		this.servletContext = context;
@@ -128,6 +134,7 @@ public class OwaActivator implements ModuleActivator, ServletContextAware {
 			}
 		}
 		
+		configureLoginUrl(appManager);
 		log.info("OWA Module refreshed");
 	}
 	
@@ -163,4 +170,27 @@ public class OwaActivator implements ModuleActivator, ServletContextAware {
 		log.info("OWA Module stopped");
 	}
 	
+	/**
+	 * Used to set the login Url Global Property that directs to the Add-on OWA UI if no UI module
+	 * is installed. Searches against the legacy and Reference Application module on installed UI
+	 * modules.
+	 */
+	private void configureLoginUrl(AppManager appManager) {
+		if (uiModuleInstalled() || !appManager.exists(ADD_ON_MANAGER_APP)) {
+			Context.getAdministrationService().setGlobalProperty(LOGIN_URL, "login.htm");
+			return;
+		}
+		App app = appManager.getAppByName(ADD_ON_MANAGER_APP);
+		String loginUrl = loginUrl = app.getLaunchUrl() == null ? "owa/" + app.getFolderName() + "/index.html" : app.getLaunchUrl(); 
+		Context.getAdministrationService().setGlobalProperty(LOGIN_URL, loginUrl.startsWith("/") ? loginUrl.substring(1) : loginUrl);
+	}
+	
+	private Boolean uiModuleInstalled() {
+		for (Module module : ModuleFactory.getStartedModules()) {
+			if ("referenceapplication".equalsIgnoreCase(module.getModuleId()) || "legacyui".equalsIgnoreCase(module.getModuleId())) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

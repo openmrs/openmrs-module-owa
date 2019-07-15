@@ -43,6 +43,8 @@ public class OwaFilterTest extends BaseModuleWebContextSensitiveTest {
 	
 	private static String FILE_SERVLET_REDIRECT_URL = "/ms/owa/fileServlet";
 	
+	private static String ADD_ON_MANAGER_REDIRECT_URL = "owa/addonmanager/index.html";
+	
 	FilterConfig filterConfig;
 	
 	ServletContext servletContext;
@@ -96,5 +98,15 @@ public class OwaFilterTest extends BaseModuleWebContextSensitiveTest {
 		owaFilter.doFilter(req, rsp, mockFilterChain);
 		Assert.assertEquals(rsp.getStatus(), 200);
 		Assert.assertNull(rsp.getForwardedUrl());
+		
+		// testing that OwaFilter uses redirects to 'Add On Manager' using 'login.url'
+		Context.getAdministrationService().setGlobalProperty("login.url", ADD_ON_MANAGER_REDIRECT_URL);
+		Context.logout();
+		mockFilterChain = new MockFilterChain();
+		req = new MockHttpServletRequest("GET", "openmrs/index.htm");
+		req.setServletPath("/index.htm");
+		owaFilter.doFilter(req, rsp, mockFilterChain);
+		Assert.assertEquals(rsp.getStatus(), 200);
+		Assert.assertEquals("/" + ADD_ON_MANAGER_REDIRECT_URL, rsp.getRedirectedUrl());
 	}
 }
