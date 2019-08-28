@@ -176,6 +176,16 @@ public class DefaultAppManager implements AppManager {
 	}
 	
 	@Override
+	public App getAppByName(String appName) {
+		for (App app : getApps()) {
+			if (app.getName().equalsIgnoreCase(appName)) {
+				return app;
+			}
+		}
+		return null;
+	}
+	
+	@Override
 	public boolean deleteApp(String name) {
 		for (App app : getApps()) {
 			if (app.getName().equals(name) || app.getFolderName().equals(name)) {

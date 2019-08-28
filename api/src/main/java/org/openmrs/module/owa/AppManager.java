@@ -74,6 +74,16 @@ public interface AppManager {
 	boolean exists(String appName);
 	
 	/**
+	 * Gets the app with the given name.
+	 * 
+	 * @since 1.11.0
+	 * 
+	 * @param appName the app name
+	 * @return app whose name matches appName
+	 */
+	App getAppByName(String appName);
+	
+	/**
 	 * Deletes the app with the given name.
 	 * 
 	 * @param name the app name.
