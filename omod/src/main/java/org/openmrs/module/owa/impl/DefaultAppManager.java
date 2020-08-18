@@ -52,6 +52,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.openmrs.module.owa.utils.OwaUtils;
+
 public class DefaultAppManager implements AppManager {
 	
 	private static final Log log = LogFactory.getLog(DefaultAppManager.class);
@@ -101,7 +103,7 @@ public class DefaultAppManager implements AppManager {
 		// Delete if app is already installed
 		// If app specified 'deployed.owa.name', use it instead of default name based on package name
 		// ---------------------------------------------------------------------
-		String deployedName = fileName.substring(0, fileName.lastIndexOf('.'));
+		String deployedName = OwaUtils.getStrippedFileName(fileName.substring(0, fileName.lastIndexOf('.')));
 		if(StringUtils.isNotBlank(app.getDeployedName())){
 			deployedName = app.getDeployedName();
 			//delete app deployed in the same directory
