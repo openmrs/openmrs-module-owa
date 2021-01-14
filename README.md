@@ -2,15 +2,15 @@
 
 OpenMRS Open Web Apps module
 ============================
-A packaged app is an [Open Web App] (https://developer.mozilla.org/en-US/docs/Open_Web_apps_and_Web_standards) that has all of its resources (HTML, CSS, JavaScript, app manifest, and so on) contained in a zip file. This module allows uploading Open Web Apps (OWA) to OpenMRS using the user-interface at runtime. A packaged app is a ZIP file with an [app manifest] (http://www.w3.org/2008/webapps/manifest/) in its root directory. The manifest must be named `manifest.webapp`. The [Mozilla page on apps] (https://developer.mozilla.org/en-US/Apps/Quickstart) provides a detailed description.
+A packaged app is an [Open Web App](https://developer.mozilla.org/en-US/docs/Open_Web_apps_and_Web_standards) that has all of its resources (HTML, CSS, JavaScript, app manifest, and so on) contained in a zip file. This module allows uploading Open Web Apps (OWA) to OpenMRS using the user-interface at runtime. A packaged app is a ZIP file with an [app manifest](http://www.w3.org/2008/webapps/manifest/) in its root directory. The manifest must be named `manifest.webapp`. The [Mozilla page on apps](https://developer.mozilla.org/en-US/Apps/Quickstart) provides a detailed description.
 
 Purpose of packaged apps
 --
-The purpose of packaged apps is to create custom UI on-top of [OpenMRS REST API] (https://wiki.openmrs.org/display/docs/REST+Web+Services+API+For+Clients). An OpenMRS implementation will often have unique requirements. Apps provide a convenient way to customize the user interface and lowers the barrier to programmer entry, by allowing choice of any web technologies. Apps do not have permissions to interact directly with the OpenMRS Java API. Instead, apps are expected to use functionality and interact with OpenMRS REST Web Services.
+The purpose of packaged apps is to create custom UI on-top of [OpenMRS REST API](https://wiki.openmrs.org/display/docs/REST+Web+Services+API+For+Clients). An OpenMRS implementation will often have unique requirements. Apps provide a convenient way to customize the user interface and lowers the barrier to programmer entry, by allowing choice of any web technologies. Apps do not have permissions to interact directly with the OpenMRS Java API. Instead, apps are expected to use functionality and interact with OpenMRS REST Web Services.
 
 Creating apps
 --
-Apps are constructed with HTML, JavaScript and CSS files. Although these can also be in Python, PHP, ASP etc., but such app deployment scenario will be described later. Apps need a special file called `manifest.webapp` which describes the contents of the app. This file should be in the format specified by the [W3C Manifest for Web Applications] (http://www.w3.org/2008/webapps/manifest/). A basic example of the manifest.webapp is shown below:
+Apps are constructed with HTML, JavaScript and CSS files. Although these can also be in Python, PHP, ASP etc., but such app deployment scenario will be described later. Apps need a special file called `manifest.webapp` which describes the contents of the app. This file should be in the format specified by the [W3C Manifest for Web Applications](http://www.w3.org/2008/webapps/manifest/). A basic example of the manifest.webapp is shown below:
 ```
 {
     "version": "0.1",
