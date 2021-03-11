@@ -39,6 +39,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.messagesource.MessageSourceService;
 import org.openmrs.module.owa.AppManager;
+import org.openmrs.module.owa.utils.OwaUtils;
 import org.openmrs.web.WebConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -72,7 +73,7 @@ public class AddAppController {
                             String fileName = file.getOriginalFilename();
                             File uploadedFile = new File(file.getOriginalFilename());
                             file.transferTo(uploadedFile);            
-                                try (ZipFile zip = new ZipFile(uploadedFile)){                	 
+                                try (ZipFile zip = new ZipFile(uploadedFile)){                                	
                                     if(zip.size() == 0){
                                         message = messageSourceService.getMessage("owa.blank_zip");
                                         log.warn("Zip file is empty");       
@@ -86,17 +87,28 @@ public class AddAppController {
                                         uploadedFile.delete();
                                         session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
                                     } 
-                                    else {
-                                        String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
-                                                + request.getServerPort() + request.getContextPath();
-                                        appManager.installApp(uploadedFile, fileName, contextPath);
-                                        message = messageSourceService.getMessage("owa.app_installed");
-                                        session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
+                                    else {                                    	
+                                    	message = appManager.extractMissingRequirementsMessage(uploadedFile, appManager.getStartedModules());
+                                    	if (!("".equals(message))) {
+                                    		
+                                    		//display error message for owa apps that need requirements first installed
+                                    		message = messageSourceService.getMessage("owa.missing_app_requirements") + message;
+                                    		log.warn(message);
+                                    		session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
+                                    	}else {
+                                    		
+                                    		//for owa apps that do not need any requirements
+	                                        String contextPath = request.getScheme() + "://" + request.getServerName() + ":"
+	                                                + request.getServerPort() + request.getContextPath();
+	                                        appManager.installApp(uploadedFile, fileName, contextPath);
+	                                        message = messageSourceService.getMessage("owa.app_installed");
+	                                        session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, message);
+                                    	}
                                     }
                                 }
                                 catch(Exception e) {
-                                    message = e.getMessage();
-                                        log.warn(message);
+                                    message = e.getMessage();                                    	
+                                        log.warn(message);                                        
                                     uploadedFile.delete();
                                     session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, message);
                                     return "redirect:manage.form";

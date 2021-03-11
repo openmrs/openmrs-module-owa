@@ -9,14 +9,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * This class contains utility methods that support various actions that affect OWAs
- * for example OWA installation
+ * This class contains utility methods that support various actions that affect OWAs for example OWA
+ * installation
  */
 public class OwaUtils {
-
+	
 	/**
 	 * Gets the file name from the OWA installation url
-	 *
+	 * 
 	 * @param installUrl URL to where the OWA zip can be downloaded
 	 * @return the file name of the owa
 	 */
@@ -29,10 +29,10 @@ public class OwaUtils {
 		}
 		return removeVersionNumber(passedFileName);
 	}
-
+	
 	/**
 	 * Removes the version number from the file name of the OWA
-	 *
+	 * 
 	 * @param passedFileName File name of owa that may contain owa version number
 	 * @return the file name of the owa with the version number removed
 	 */
@@ -44,4 +44,5 @@ public class OwaUtils {
 		}
 		return fileName;
 	}
+	
 }

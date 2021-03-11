@@ -4,12 +4,14 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.module.Module;
 import org.openmrs.module.owa.App;
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.module.owa.OwaListener;
@@ -23,6 +25,8 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -45,6 +49,14 @@ public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 	OwaListener listener;
 	
 	File owaDir;
+	
+	Module module1 = module1 = new Module(null, null, "org.openmrs.module.owa", null, null, "1.9.*");	
+	Module module2 = module2 = new Module(null, null, "org.openmrs.module.webservices.rest", null, null, "2.23.0-SNAPSHOT");	
+	Module module3 = module3 = new Module(null, null, "org.openmrs.module.fhir", null, null, "1.13.1");	
+	Module module4 = module4 = new Module(null, null, "org.openmrs.module.fhir", null, null, "1.9.2");
+	
+	List<Module> installedModules1 = new ArrayList<>();
+	List<Module> installedModules2 = new ArrayList<>();
 	
 	@Before
 	public void setUp() throws Exception {
@@ -156,5 +168,37 @@ public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 		initMethod.invoke(appManager);
 		
 		verify(listener).appsReloaded(anyListOf(App.class));
+	}
+	
+	@Test
+	public void shouldReturnEmptyStringWhenRequirementsSatisfied() throws Exception {
+		String errorMessage = null;
+		installedModules1.add(module1);
+		installedModules1.add(module2);
+		installedModules1.add(module3);
+		
+		try {
+			errorMessage = appManager.extractMissingRequirementsMessage(getFile("/dummy1-cohortbuilder-1.0.0-beta.zip"), installedModules1);
+		}catch(Exception e) {
+			
+		}
+		Assert.assertTrue(errorMessage.contains(""));
+	}
+	
+	@Test
+	public void shouldReturnStringWithMissingOpenmrsCoreVersion() throws Exception {
+		String errorMessage = null;
+		installedModules2.add(module1);
+		installedModules2.add(module2);
+		installedModules2.add(module4);
+		
+		try {
+			errorMessage = appManager.extractMissingRequirementsMessage(getFile("/dummy2-cohortbuilder-1.0.0-beta.zip"), installedModules2);
+		}catch(Exception e) {
+			
+		}
+		Assert.assertTrue(errorMessage.contains("OpenMRS-core version: 2.1.*"));
+		Assert.assertTrue(errorMessage.contains("fhir version: 1.13.1"));
+		Assert.assertFalse(errorMessage.contains("webservices.rest version: 2.22.0"));
 	}
 }

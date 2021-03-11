@@ -28,37 +28,38 @@
 package org.openmrs.module.owa;
 
 import java.io.Serializable;
+import java.util.List;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
- * @author Saptarshi
+ * @since 1.11.0
  */
-public class AppOpenmrs implements Serializable {
+public class AppRequirements implements Serializable {
 	
 	/**
 	 * Determines if a de-serialized file is compatible with this class.
 	 */
-	private static final long serialVersionUID = -7664121469721457843L;
+	private static final long serialVersionUID = -3913409930138266540L;
 	
-	@JsonProperty("href")
-	private String href;
+	@JsonProperty("coreVersion")
+	private String coreVersion;
 	
-	@JsonProperty("requirements")
-	private AppRequirements requirements;
+	@JsonProperty("requiredModules")
+	private List<AppRequiredModule> requiredModules;
 	
-	public String getHref() {
-		return href;
+	public String getCoreVersion() {
+		return coreVersion;
 	}
 	
-	public void setHref(String href) {
-		this.href = href;
+	public void setCoreVersion(String coreVersion) {
+		this.coreVersion = coreVersion;
 	}
 	
-	public AppRequirements getRequirements() {
-		return requirements;
+	public List<AppRequiredModule> getRequiredModules() {
+		return requiredModules;
 	}
 	
-	public void setRequirements(AppRequirements requirements) {
-		this.requirements = requirements;
+	public void setRequiredModules(List<AppRequiredModule> requiredModules) {
+		this.requiredModules = requiredModules;
 	}
 }
