@@ -133,7 +133,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 	public void install_rightDownloadUrl() throws Exception {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/installapp");
 		HttpServletResponse response = new MockHttpServletResponse();
-		String downloadUrl = "https://bintray.com/openmrs/owa/download_file?file_path=cohortbuilder-1.0.0-beta.zip";
+		String downloadUrl = "https://openmrs.jfrog.io/artifactory/owa/org/openmrs/owa/cohortbuilder/1.0.0/cohortbuilder-1.0.0.zip";
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
 		ResponseEntity<List<App>> appList = controller.install(requestData, request, response);
@@ -166,7 +166,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 	public void install_urlEndsWithFileName() throws Exception {
 		HttpServletRequest request = new MockHttpServletRequest(new MockServletContext(), "POST", "/rest/owa/installapp");
 		HttpServletResponse response = new MockHttpServletResponse();
-		String downloadUrl = "https://dl.bintray.com/openmrs/owa/cohortbuilder-1.0.0-beta.zip";
+		String downloadUrl = "https://openmrs.jfrog.io/artifactory/owa/org/openmrs/owa/cohortbuilder/1.0.0/cohortbuilder-1.0.0.zip";
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
 		ResponseEntity<List<App>> appList = controller.install(requestData, request, response);
