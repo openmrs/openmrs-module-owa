@@ -65,7 +65,7 @@ public class AddAppController {
 	
 	private String message;
 	
-	@RequestMapping(value = "/module/owa/addApp", method = RequestMethod.POST)
+	@RequestMapping(value = "/module/owa/addApp.htm", method = RequestMethod.POST)
         public String upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
                 if(Context.hasPrivilege("Manage OWA")){
                         HttpSession session = request.getSession();		
