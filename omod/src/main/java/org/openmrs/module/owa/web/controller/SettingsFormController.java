@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/module/owa/settings")
+@RequestMapping("/module/owa/settings.form")
 public class SettingsFormController {
 	
 	private static final Log log = LogFactory.getLog(SettingsFormController.class);

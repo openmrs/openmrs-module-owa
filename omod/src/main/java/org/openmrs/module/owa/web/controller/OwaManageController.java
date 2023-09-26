@@ -40,7 +40,7 @@ public class OwaManageController {
 	AppManager appManager;
 	
 	@ModelAttribute("appList")
-	@RequestMapping(value = "/manage", method = RequestMethod.GET)
+	@RequestMapping(value = "/manage.form", method = RequestMethod.GET)
 	public List<App> manage(ModelMap model) {
 		List<App> appList = new ArrayList<>();
 		if (Context.hasPrivilege("Manage OWA")) {
@@ -50,7 +50,7 @@ public class OwaManageController {
 		return appList;
 	}
 	
-	@RequestMapping(value = "/deleteApp", method = RequestMethod.GET)
+	@RequestMapping(value = "/deleteApp.htm", method = RequestMethod.GET)
 	public String deleteApp(@RequestParam("appName") String appName,
 	        @RequestParam(value = "returnURL", required = false) String returnURL, ModelMap model) {
 		if (appName != null && Context.hasPrivilege("Manage OWA")) {
@@ -60,7 +60,7 @@ public class OwaManageController {
 		return returnURL != null ? returnURL : "redirect:manage.form";
 	}
 	
-	@RequestMapping(value = "/manager", method = RequestMethod.GET)
+	@RequestMapping(value = "/manager.form", method = RequestMethod.GET)
 	public String loadSettings(HttpServletRequest request, ModelMap model) {
 		if (Context.hasPrivilege("Manage OWA")) {
 			String appFolderPath = appManager.getAppFolderPath();
