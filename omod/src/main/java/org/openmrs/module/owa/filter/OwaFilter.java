@@ -5,9 +5,13 @@
  */
 package org.openmrs.module.owa.filter;
 
-import org.apache.commons.lang3.StringUtils;
+import org.openmrs.Privilege;
+import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.owa.AppManager;
+import org.openmrs.util.PrivilegeConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -28,6 +32,8 @@ public class OwaFilter implements Filter {
 	
 	private static final String ADD_ON_MANAGER = "addonmanager";
 	
+	private static final Logger logger = LoggerFactory.getLogger(OwaFilter.class);
+	
 	private String openmrsPath;
 	
 	@Override
@@ -38,11 +44,16 @@ public class OwaFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
-		String owaBasePath = Context.getAdministrationService().getGlobalProperty(AppManager.KEY_APP_BASE_URL,
-		    DEFAULT_BASE_URL);
 		
-		if (StringUtils.isBlank(owaBasePath)) {
-			owaBasePath = DEFAULT_BASE_URL;
+		String owaBasePath = DEFAULT_BASE_URL;
+		
+		try {
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			owaBasePath = Context.getAdministrationService()
+			        .getGlobalProperty(AppManager.KEY_APP_BASE_URL, DEFAULT_BASE_URL);
+		}
+		finally {
+			Context.removeProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
 		}
 		
 		String requestURL = null;
@@ -52,7 +63,15 @@ public class OwaFilter implements Filter {
 			requestURL = request.getServletPath();
 		}
 		
-		String loginUrl = Context.getAdministrationService().getGlobalProperty("login.url", "login.htm");
+		String loginUrl;
+		try {
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			loginUrl = Context.getAdministrationService().getGlobalProperty("login.url", "login.htm");
+		}
+		finally {
+			Context.removeProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+		}
+		
 		if (Context.isAuthenticated()) {
 			if (requestURL.startsWith(owaBasePath)) {
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
