@@ -181,13 +181,16 @@ public class OwaActivator implements ModuleActivator, ServletContextAware {
 			return;
 		}
 		App app = appManager.getAppByName(ADD_ON_MANAGER_APP);
-		String loginUrl = loginUrl = app.getLaunchUrl() == null ? "owa/" + app.getFolderName() + "/index.html" : app.getLaunchUrl(); 
-		Context.getAdministrationService().setGlobalProperty(LOGIN_URL, loginUrl.startsWith("/") ? loginUrl.substring(1) : loginUrl);
+		String loginUrl = loginUrl = app.getLaunchUrl() == null ? "owa/" + app.getFolderName() + "/index.html" : app
+		        .getLaunchUrl();
+		Context.getAdministrationService().setGlobalProperty(LOGIN_URL,
+		    loginUrl.startsWith("/") ? loginUrl.substring(1) : loginUrl);
 	}
 	
 	private Boolean uiModuleInstalled() {
 		for (Module module : ModuleFactory.getStartedModules()) {
-			if ("referenceapplication".equalsIgnoreCase(module.getModuleId()) || "legacyui".equalsIgnoreCase(module.getModuleId())) {
+			if ("referenceapplication".equalsIgnoreCase(module.getModuleId())
+			        || "legacyui".equalsIgnoreCase(module.getModuleId())) {
 				return true;
 			}
 		}
