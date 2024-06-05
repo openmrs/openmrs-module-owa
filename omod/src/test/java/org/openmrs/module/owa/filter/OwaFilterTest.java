@@ -106,7 +106,7 @@ public class OwaFilterTest extends BaseModuleWebContextSensitiveTest {
 		req = new MockHttpServletRequest("GET", "openmrs/index.htm");
 		req.setServletPath("/index.htm");
 		owaFilter.doFilter(req, rsp, mockFilterChain);
-		Assert.assertEquals(rsp.getStatus(), 200);
+		Assert.assertEquals(rsp.getStatus(), 302);
 		Assert.assertEquals("/" + ADD_ON_MANAGER_REDIRECT_URL, rsp.getRedirectedUrl());
 	}
 }

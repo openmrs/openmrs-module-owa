@@ -77,6 +77,12 @@
             <scope>test</scope>
         </dependency>
         <!-- End OpenMRS core -->
+
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jasper</artifactId>
+            <scope>provided</scope>
+        </dependency>
         
     </dependencies>
 
