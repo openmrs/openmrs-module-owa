@@ -40,7 +40,7 @@
     </modules>
 	
     <properties>
-        <openMRSVersion>1.9.7</openMRSVersion>
+        <openMRSVersion>1.11.0</openMRSVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -106,6 +106,12 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>1.21</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>tomcat-jasper</artifactId>
+                <version>8.5.100</version>
+                <scope>provided</scope>
             </dependency>
 
         </dependencies>

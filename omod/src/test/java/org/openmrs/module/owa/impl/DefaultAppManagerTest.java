@@ -60,7 +60,7 @@ public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		initMocks(this);
+		initMocks();
 		appManager = new DefaultAppManager();
 		appManager.setOwaListeners(Arrays.asList(listener));
 		owaDir = Files.createTempDirectory("owa").toFile();
