@@ -82,9 +82,12 @@ public class OwaFilter implements Filter {
 	public void destroy() {
 	}
 	
-	private void doFilter(ServletRequest req, ServletResponse res, FilterChain chain, String loginUrl) throws IOException, ServletException {
+	private void doFilter(ServletRequest req, ServletResponse res, FilterChain chain, String loginUrl) throws IOException,
+	        ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
-		if (loginUrl.contains(ADD_ON_MANAGER) && (request.getServletPath().equals("/index.htm") || request.getServletPath().equals("/login.htm") || request.getServletPath().equals("/"))) {
+		if (loginUrl.contains(ADD_ON_MANAGER)
+		        && (request.getServletPath().equals("/index.htm") || request.getServletPath().equals("/login.htm") || request
+		                .getServletPath().equals("/"))) {
 			((HttpServletResponse) res).sendRedirect(request.getContextPath() + "/" + loginUrl);
 		} else {
 			chain.doFilter(req, res);
