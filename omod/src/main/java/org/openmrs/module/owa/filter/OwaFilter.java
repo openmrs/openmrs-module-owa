@@ -66,12 +66,9 @@ public class OwaFilter implements Filter {
 		}
 		
 		String loginUrl;
-		boolean redirectToLoginUrl;
 		try {
 			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
 			loginUrl = Context.getAdministrationService().getGlobalProperty("login.url", "login.htm");
-			redirectToLoginUrl = !"false".equalsIgnoreCase(Context.getAdministrationService().getGlobalProperty(
-			    REDIRECT_TO_LOGIN_URL, "true"));
 		}
 		finally {
 			Context.removeProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
@@ -86,7 +83,7 @@ public class OwaFilter implements Filter {
 			}
 		} else {
 			// Redirect to login.url, unless disabled so that another filter (eg. the authentication module's) handles login
-			if (requestURL.startsWith(owaBasePath) && redirectToLoginUrl) {
+			if (requestURL.startsWith(owaBasePath) && isRedirectToLoginUrl()) {
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/redirectServlet");
 				if (requestURL.contains(loginUrl) || requestURL.contains(ADD_ON_MANAGER)) {
 					newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
@@ -95,6 +92,18 @@ public class OwaFilter implements Filter {
 			} else {
 				doFilter(req, res, chain, loginUrl);
 			}
+		}
+	}
+	
+	// Only read for unauthenticated requests for apps, to avoid a lookup on every request
+	private boolean isRedirectToLoginUrl() {
+		try {
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			return !"false".equalsIgnoreCase(Context.getAdministrationService().getGlobalProperty(REDIRECT_TO_LOGIN_URL,
+			    "true"));
+		}
+		finally {
+			Context.removeProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
 		}
 	}
 	
