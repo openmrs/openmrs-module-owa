@@ -43,6 +43,8 @@ public class OwaFilterTest extends BaseModuleWebContextSensitiveTest {
 	
 	private static String FILE_SERVLET_REDIRECT_URL = "/ms/owa/fileServlet";
 	
+	private static String REDIRECT_SERVLET_URL = "/ms/owa/redirectServlet";
+	
 	private static String ADD_ON_MANAGER_REDIRECT_URL = "owa/addonmanager/index.html";
 	
 	FilterConfig filterConfig;
@@ -108,5 +110,48 @@ public class OwaFilterTest extends BaseModuleWebContextSensitiveTest {
 		owaFilter.doFilter(req, rsp, mockFilterChain);
 		Assert.assertEquals(rsp.getStatus(), 302);
 		Assert.assertEquals("/" + ADD_ON_MANAGER_REDIRECT_URL, rsp.getRedirectedUrl());
+	}
+	
+	/**
+	 * Test that requests for apps from unauthenticated users are sent to the redirect servlet by
+	 * default
+	 */
+	@Test
+	public void testOwaFilterRedirectsUnauthenticatedRequestsToLoginUrlByDefault() throws Exception {
+		Context.logout();
+		MockFilterChain mockFilterChain = new MockFilterChain();
+		MockHttpServletResponse rsp = new MockHttpServletResponse();
+		unauthenticatedFilter().doFilter(unauthenticatedAppRequest(), rsp, mockFilterChain);
+		Assert.assertEquals(REDIRECT_SERVLET_URL + SOME_PATH_IN_APP, rsp.getForwardedUrl());
+		Assert.assertNull(mockFilterChain.getRequest());
+	}
+	
+	/**
+	 * Test that requests for apps from unauthenticated users are passed on, for another filter to
+	 * handle, when redirecting to login.url is disabled
+	 */
+	@Test
+	public void testOwaFilterPassesOnUnauthenticatedRequestsIfRedirectToLoginUrlDisabled() throws Exception {
+		Context.getAdministrationService().setGlobalProperty(OwaFilter.REDIRECT_TO_LOGIN_URL, "false");
+		Context.logout();
+		MockFilterChain mockFilterChain = new MockFilterChain();
+		MockHttpServletResponse rsp = new MockHttpServletResponse();
+		MockHttpServletRequest req = unauthenticatedAppRequest();
+		unauthenticatedFilter().doFilter(req, rsp, mockFilterChain);
+		Assert.assertNull(rsp.getForwardedUrl());
+		Assert.assertNull(rsp.getRedirectedUrl());
+		Assert.assertEquals(req, mockFilterChain.getRequest());
+	}
+	
+	private OwaFilter unauthenticatedFilter() throws Exception {
+		OwaFilter owaFilter = new OwaFilter();
+		owaFilter.init(filterConfig);
+		return owaFilter;
+	}
+	
+	private MockHttpServletRequest unauthenticatedAppRequest() {
+		MockHttpServletRequest req = new MockHttpServletRequest("GET", DEFAULT_APP_BASE_URI + SOME_PATH_IN_APP);
+		req.setServletPath(DEFAULT_APP_BASE_SERVLET_PATH);
+		return req;
 	}
 }
