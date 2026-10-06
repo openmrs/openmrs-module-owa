@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openmrs.api.context.Context;
+import org.openmrs.util.PrivilegeConstants;
 
 public class RedirectServlet extends HttpServlet {
 	
@@ -53,7 +54,14 @@ public class RedirectServlet extends HttpServlet {
 	        throws IOException {
 		String url = request.getRequestURL().toString().replace("/ms/owa/redirectServlet", "/owa");
 		//@TODO redirecting to original url after login in openmrs.
-		String loginUrl = Context.getAdministrationService().getGlobalProperty("login.url", "login.htm");
+		String loginUrl;
+		try {
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			loginUrl = Context.getAdministrationService().getGlobalProperty("login.url", "login.htm");
+		}
+		finally {
+			Context.removeProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+		}
 		response.sendRedirect(request.getContextPath() + "/" + loginUrl + "?redirect=" + url);
 	}
 }

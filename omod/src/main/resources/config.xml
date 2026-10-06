@@ -78,7 +78,8 @@
         <defaultValue>true</defaultValue>
         <description>
             If true, users who are not logged in are redirected from an app to the page in login.url.  Set to false to
-            leave them to another module to send to log in, such as the authentication module
+            leave them to another module to send to log in, such as the authentication module when authentication.scheme
+            names a web scheme.  If nothing else handles them, they get a 404
         </description>
     </globalProperty>
 
