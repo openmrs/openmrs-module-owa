@@ -8,7 +8,6 @@ package org.openmrs.module.owa.filter;
 import org.openmrs.Privilege;
 import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.ModuleFactory;
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.util.PrivilegeConstants;
 import org.slf4j.Logger;
@@ -32,6 +31,8 @@ public class OwaFilter implements Filter {
 	public static final String DEFAULT_BASE_URL = "/owa";
 	
 	private static final String ADD_ON_MANAGER = "addonmanager";
+	
+	public static final String REDIRECT_TO_LOGIN_URL = "owa.redirectToLoginUrl";
 	
 	private static final Logger logger = LoggerFactory.getLogger(OwaFilter.class);
 	
@@ -65,9 +66,12 @@ public class OwaFilter implements Filter {
 		}
 		
 		String loginUrl;
+		boolean redirectToLoginUrl;
 		try {
 			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
 			loginUrl = Context.getAdministrationService().getGlobalProperty("login.url", "login.htm");
+			redirectToLoginUrl = !"false".equalsIgnoreCase(Context.getAdministrationService().getGlobalProperty(
+			    REDIRECT_TO_LOGIN_URL, "true"));
 		}
 		finally {
 			Context.removeProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
@@ -81,8 +85,8 @@ public class OwaFilter implements Filter {
 				doFilter(req, res, chain, loginUrl);
 			}
 		} else {
-			// If the authentication module is running, leave unauthenticated requests for it to send to login
-			if (requestURL.startsWith(owaBasePath) && !isAuthenticationModuleStarted()) {
+			// Redirect to login.url, unless disabled so that another filter (eg. the authentication module's) handles login
+			if (requestURL.startsWith(owaBasePath) && redirectToLoginUrl) {
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/redirectServlet");
 				if (requestURL.contains(loginUrl) || requestURL.contains(ADD_ON_MANAGER)) {
 					newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
@@ -92,10 +96,6 @@ public class OwaFilter implements Filter {
 				doFilter(req, res, chain, loginUrl);
 			}
 		}
-	}
-	
-	protected boolean isAuthenticationModuleStarted() {
-		return ModuleFactory.isModuleStarted("authentication");
 	}
 	
 	//owaBasePath can be either full path (must contain protocol) or relative servlet path
