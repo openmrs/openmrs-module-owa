@@ -8,6 +8,7 @@ package org.openmrs.module.owa.filter;
 import org.openmrs.Privilege;
 import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.ModuleFactory;
 import org.openmrs.module.owa.AppManager;
 import org.openmrs.util.PrivilegeConstants;
 import org.slf4j.Logger;
@@ -80,7 +81,8 @@ public class OwaFilter implements Filter {
 				doFilter(req, res, chain, loginUrl);
 			}
 		} else {
-			if (requestURL.startsWith(owaBasePath)) {
+			// If the authentication module is running, leave unauthenticated requests for it to send to login
+			if (requestURL.startsWith(owaBasePath) && !isAuthenticationModuleStarted()) {
 				String newURL = requestURL.replace(owaBasePath, "/ms/owa/redirectServlet");
 				if (requestURL.contains(loginUrl) || requestURL.contains(ADD_ON_MANAGER)) {
 					newURL = requestURL.replace(owaBasePath, "/ms/owa/fileServlet");
@@ -90,6 +92,10 @@ public class OwaFilter implements Filter {
 				doFilter(req, res, chain, loginUrl);
 			}
 		}
+	}
+	
+	protected boolean isAuthenticationModuleStarted() {
+		return ModuleFactory.isModuleStarted("authentication");
 	}
 	
 	//owaBasePath can be either full path (must contain protocol) or relative servlet path
