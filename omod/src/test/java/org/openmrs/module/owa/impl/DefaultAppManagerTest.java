@@ -32,8 +32,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -50,10 +50,10 @@ public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 	
 	File owaDir;
 	
-	Module module1 = module1 = new Module(null, null, "org.openmrs.module.owa", null, null, "1.9.*");	
-	Module module2 = module2 = new Module(null, null, "org.openmrs.module.webservices.rest", null, null, "2.23.0-SNAPSHOT");	
-	Module module3 = module3 = new Module(null, null, "org.openmrs.module.fhir", null, null, "1.13.1");	
-	Module module4 = module4 = new Module(null, null, "org.openmrs.module.fhir", null, null, "1.9.2");
+	Module module1 = module1 = new Module(null, null, "org.openmrs.module.owa", null, null, "1.9.*", null);	
+	Module module2 = module2 = new Module(null, null, "org.openmrs.module.webservices.rest", null, null, "2.23.0-SNAPSHOT", null);	
+	Module module3 = module3 = new Module(null, null, "org.openmrs.module.fhir", null, null, "1.13.1", null);	
+	Module module4 = module4 = new Module(null, null, "org.openmrs.module.fhir", null, null, "1.9.2", null);
 	
 	List<Module> installedModules1 = new ArrayList<>();
 	List<Module> installedModules2 = new ArrayList<>();
@@ -167,7 +167,7 @@ public class DefaultAppManagerTest extends BaseModuleWebContextSensitiveTest {
 		ReflectionUtils.makeAccessible(initMethod);
 		initMethod.invoke(appManager);
 		
-		verify(listener).appsReloaded(anyListOf(App.class));
+		verify(listener).appsReloaded(anyList());
 	}
 	
 	@Test

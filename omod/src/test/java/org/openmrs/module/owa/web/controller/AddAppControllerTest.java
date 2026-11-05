@@ -80,7 +80,7 @@ public class AddAppControllerTest extends BaseModuleWebContextSensitiveTest {
 		MockMultipartFile multifile = new MockMultipartFile("testFile", "Blank_Zip.zip", null, file);
 		AddAppController controller = (AddAppController) applicationContext.getBean("addAppController");
 		controller.upload(multifile, request);
-		Assert.assertEquals("owa.blank_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
+		Assert.assertEquals(Context.getMessageSourceService().getMessage("owa.blank_zip"), request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
 	
 	@Test
@@ -92,7 +92,7 @@ public class AddAppControllerTest extends BaseModuleWebContextSensitiveTest {
 		        file);
 		AddAppController controller = (AddAppController) applicationContext.getBean("addAppController");
 		controller.upload(multifile, request);
-		Assert.assertEquals("owa.manifest_not_found", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
+		Assert.assertEquals(Context.getMessageSourceService().getMessage("owa.manifest_not_found"), request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
 	
 	@Test
@@ -102,7 +102,7 @@ public class AddAppControllerTest extends BaseModuleWebContextSensitiveTest {
 		MockMultipartFile multifile = new MockMultipartFile("testFile", "designer.zip", "application/zip,.zip", file);
 		AddAppController controller = (AddAppController) applicationContext.getBean("addAppController");
 		controller.upload(multifile, request);
-		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
+		Assert.assertEquals(Context.getMessageSourceService().getMessage("owa.app_installed"), request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
 	}
 	
 }

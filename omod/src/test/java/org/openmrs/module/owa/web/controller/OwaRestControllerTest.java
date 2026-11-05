@@ -67,7 +67,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 	@Test
 	public void updateSettings_shouldNotReturnNull() throws Exception {
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
-		List<GlobalProperty> settings = Context.getAdministrationService().getGlobalProperties();
+		List<GlobalProperty> settings = Context.getAdministrationService().getAllGlobalProperties();
 		Assert.assertNotNull(controller.updateSettings(settings));
 	}
 	
@@ -101,7 +101,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		MockMultipartFile mmf = new MockMultipartFile("emptyZipFile", "Blank_Zip.zip", null, file);
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		controller.upload(mmf, request, response);
-		Assert.assertEquals("owa.blank_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
+		Assert.assertEquals(Context.getMessageSourceService().getMessage("owa.blank_zip"), request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
 	
 	@Test
@@ -114,7 +114,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		        file);
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		controller.upload(mmf, request, response);
-		Assert.assertEquals("owa.manifest_not_found", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
+		Assert.assertEquals(Context.getMessageSourceService().getMessage("owa.manifest_not_found"), request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
 	
 	@Test
@@ -126,7 +126,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		        file);
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		controller.upload(multifile, request, response);
-		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
+		Assert.assertEquals(Context.getMessageSourceService().getMessage("owa.app_installed"), request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
 	}
 	
 	@Test
@@ -137,7 +137,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
 		ResponseEntity<List<App>> appList = controller.install(requestData, request, response);
-		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
+		Assert.assertEquals(Context.getMessageSourceService().getMessage("owa.app_installed"), request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
 	}
 	
 	@Test
@@ -148,7 +148,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
 		ResponseEntity<List<App>> appList = controller.install(requestData, request, response);
-		Assert.assertEquals("owa.not_a_zip", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
+		Assert.assertEquals(Context.getMessageSourceService().getMessage("owa.not_a_zip"), request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
 	
 	@Test
@@ -159,7 +159,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
 		ResponseEntity<List<App>> appList = controller.install(requestData, request, response);
-		Assert.assertEquals("owa.invalid_owa_Url", request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
+		Assert.assertEquals(Context.getMessageSourceService().getMessage("owa.invalid_owa_Url"), request.getSession().getAttribute(WebConstants.OPENMRS_ERROR_ATTR));
 	}
 	
 	@Test
@@ -170,7 +170,7 @@ public class OwaRestControllerTest extends BaseModuleWebContextSensitiveTest {
 		OwaRestController controller = (OwaRestController) applicationContext.getBean("owaRestController");
 		InstallAppRequestObject requestData = new InstallAppRequestObject(downloadUrl);
 		ResponseEntity<List<App>> appList = controller.install(requestData, request, response);
-		Assert.assertEquals("owa.app_installed", request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
+		Assert.assertEquals(Context.getMessageSourceService().getMessage("owa.app_installed"), request.getSession().getAttribute(WebConstants.OPENMRS_MSG_ATTR));
 	}
 	
 	@Test
