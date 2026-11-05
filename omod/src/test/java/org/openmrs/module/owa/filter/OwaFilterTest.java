@@ -27,11 +27,11 @@ import static org.mockito.Mockito.when;
 
 public class OwaFilterTest extends BaseModuleWebContextSensitiveTest {
 	
-	private static String DEFAULT_APP_BASE_URL = "http://localhost:80/openmrs/owa";
+	private static String DEFAULT_APP_BASE_URL = "http://localhost/openmrs/owa";
 	
 	private static String DEFAULT_APP_BASE_URI = "/openmrs/owa";
 	
-	private static String SOME_RANDOM_BASE_URL = "http://localhost:80/openmrs/somethingbesidesthedefault";
+	private static String SOME_RANDOM_BASE_URL = "http://localhost/openmrs/somethingbesidesthedefault";
 	
 	private static String SOME_RANDOM_BASE_URI = "/openmrs/somethingbesidesthedefault";
 	
@@ -39,7 +39,7 @@ public class OwaFilterTest extends BaseModuleWebContextSensitiveTest {
 	
 	private static String DEFAULT_APP_BASE_SERVLET_PATH = "/owa" + SOME_PATH_IN_APP;
 	
-	private static String DUMMY_CONTEXT_PATH = "http://localhost:80/openmrs";
+	private static String DUMMY_CONTEXT_PATH = "http://localhost/openmrs";
 	
 	private static String FILE_SERVLET_REDIRECT_URL = "/ms/owa/fileServlet";
 	

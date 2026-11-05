@@ -4,7 +4,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>owa</artifactId>
-    <version>1.16.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Open Web Apps Module</name>
     <description>Add Open Web Apps to OpenMRS</description>
@@ -40,7 +40,7 @@
     </modules>
 	
     <properties>
-        <openMRSVersion>1.11.0</openMRSVersion>
+        <openMRSVersion>2.7.0</openMRSVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -62,6 +62,12 @@
                 <version>${openMRSVersion}</version>
                 <type>jar</type>
                 <scope>provided</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 						
             <dependency>
@@ -78,6 +84,12 @@
                 <version>${openMRSVersion}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 			
             <dependency>
@@ -90,6 +102,20 @@
 						
             <!-- End OpenMRS core -->
             
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>4.0.1</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>legacyui-omod</artifactId>
+                <version>1.24.0</version>
+                <scope>provided</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-core-asl</artifactId>
@@ -127,6 +153,11 @@
                         <target>8</target>
                         <source>8</source>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.openmrs.maven.plugins</groupId>
@@ -182,5 +213,42 @@
     		<url>https://mavenrepo.openmrs.org/snapshots</url>
     	</snapshotRepository>
     </distributionManagement>
+
+    <profiles>
+        <!-- On Java 17, openmrs-test 2.7.x switches to mockito-core 5.x, which needs a newer byte-buddy than hibernate provides and is incompatible with the PowerMock mock maker -->
+        <profile>
+            <id>java17</id>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.bytebuddy</groupId>
+                        <artifactId>byte-buddy</artifactId>
+                        <version>1.15.10</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.bytebuddy</groupId>
+                        <artifactId>byte-buddy-agent</artifactId>
+                        <version>1.15.10</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.openmrs.test</groupId>
+                        <artifactId>openmrs-test</artifactId>
+                        <version>${openMRSVersion}</version>
+                        <type>pom</type>
+                        <scope>test</scope>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.powermock</groupId>
+                                <artifactId>*</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+    </profiles>
 
 </project>
