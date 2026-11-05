@@ -121,30 +121,11 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>com.googlecode.maven-java-formatter-plugin</groupId>
-                    <artifactId>maven-java-formatter-plugin</artifactId>
-                    <configuration>
-                        <compilerSource>${javaCompilerVersion}</compilerSource>
-                        <compilerCompliance>${javaCompilerVersion}</compilerCompliance>
-                        <compilerTargetPlatform>${javaCompilerVersion}</compilerTargetPlatform>
-                        <configFile>../OpenMRSFormatter.xml</configFile>
-                        <overrideConfigCompilerVersion>true</overrideConfigCompilerVersion>
-                        <lineEnding>CRLF</lineEnding>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>format</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
-                        <target>1.7</target>
-                        <source>1.7</source>
+                        <target>8</target>
+                        <source>8</source>
                     </configuration>
                 </plugin>
                 <plugin>
